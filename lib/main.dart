@@ -1487,6 +1487,734 @@ class _UsersPageState extends State<UsersPage> {
   }
 }
 
+class PetsPage extends StatefulWidget {
+  final Function(String) onNavigate;
+
+  const PetsPage({Key? key, required this.onNavigate}) : super(key: key);
+
+  @override
+  State<PetsPage> createState() => _PetsPageState();
+}
+
+class _PetsPageState extends State<PetsPage> {
+  String searchQuery = '';
+
+  final List<Map<String, dynamic>> pets = [
+    {
+      'name': 'Buddy',
+      'type': 'Dog',
+      'breed': 'Golden Retriever',
+      'age': 3,
+      'color': 'Golden',
+      'owner': 'John Doe',
+      'registrationDate': '2023-05-15',
+      'hasQRTag': true,
+      'icon': '🐕',
+    },
+    {
+      'name': 'Max',
+      'type': 'Dog',
+      'breed': 'Labrador',
+      'age': 2,
+      'color': 'Black',
+      'owner': 'Jane Smith',
+      'registrationDate': '2023-08-22',
+      'hasQRTag': false,
+      'icon': '🐕',
+    },
+    {
+      'name': 'Charlie',
+      'type': 'Cat',
+      'breed': 'Persian',
+      'age': 1,
+      'color': 'White',
+      'owner': 'Alice Brown',
+      'registrationDate': '2024-01-10',
+      'hasQRTag': true,
+      'icon': '🐱',
+    },
+  ];
+
+  List<Map<String, dynamic>> get filteredPets {
+    if (searchQuery.isEmpty) {
+      return pets;
+    }
+    return pets.where((pet) {
+      final query = searchQuery.toLowerCase();
+      return pet['name'].toString().toLowerCase().contains(query) ||
+          pet['breed'].toString().toLowerCase().contains(query) ||
+          pet['owner'].toString().toLowerCase().contains(query);
+    }).toList();
+  }
+
+  Map<String, List<Map<String, dynamic>>> get petsByType {
+    final Map<String, List<Map<String, dynamic>>> grouped = {};
+    for (var pet in filteredPets) {
+      final type = pet['type'] as String;
+      grouped.putIfAbsent(type, () => []);
+      grouped[type]!.add(pet);
+    }
+    return grouped;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Container(
+            width: 250,
+            color: Colors.white,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'PawVera Admin',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  Divider(color: Colors.grey[200]),
+                  _buildNavItem(
+                    icon: Icons.dashboard,
+                    label: 'Dashboard',
+                    isActive: false,
+                    onTap: () => widget.onNavigate('dashboard'),
+                  ),
+                  _buildNavItem(
+                    icon: Icons.people,
+                    label: 'Users',
+                    isActive: false,
+                    onTap: () => widget.onNavigate('users'),
+                  ),
+                  _buildNavItem(
+                    icon: Icons.store,
+                    label: 'Pet Supplies Stores',
+                    isActive: false,
+                    onTap: () => widget.onNavigate('stores'),
+                  ),
+                  _buildNavItem(
+                    icon: Icons.business,
+                    label: 'Service Provider Shops',
+                    isActive: false,
+                    onTap: () => widget.onNavigate('services'),
+                  ),
+                  _buildNavItem(
+                    icon: Icons.category,
+                    label: 'Pet Types',
+                    isActive: false,
+                    onTap: () => widget.onNavigate('types'),
+                  ),
+                  _buildNavItem(
+                    icon: Icons.pets,
+                    label: 'Pets',
+                    isActive: true,
+                    onTap: () {},
+                  ),
+                  _buildNavItem(
+                    icon: Icons.favorite,
+                    label: 'Pet Adoption',
+                    isActive: false,
+                    onTap: () => widget.onNavigate('adoption'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Pets',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.account_circle, color: Colors.grey),
+                          const SizedBox(width: 12),
+                          const Icon(Icons.notifications, color: Colors.grey),
+                          const SizedBox(width: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text('Admin', style: TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                onChanged: (value) {
+                                  setState(() => searchQuery = value);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Search by name, breed, or owner',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Text('Total Pets', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${filteredPets.length}',
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Text('With QR Tags', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${filteredPets.where((p) => p['hasQRTag']).length}',
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Text('Pet Types', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${petsByType.keys.length}',
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        ...petsByType.entries.map((entry) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${entry.key}s (${entry.value.length})',
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 12),
+                              GridView.count(
+                                crossAxisCount: 3,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: 1.2,
+                                children: entry.value.map((pet) => _buildPetCard(pet)).toList(),
+                              ),
+                              const SizedBox(height: 32),
+                            ],
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPetCard(Map<String, dynamic> pet) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[200]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  pet['icon'],
+                  style: const TextStyle(fontSize: 24),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: pet['type'] == 'Dog' ? Colors.brown[100] : Colors.orange[100],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    pet['type'],
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: pet['type'] == 'Dog' ? Colors.brown : Colors.orange,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        pet['name'],
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      if (pet['hasQRTag'])
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[100],
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: const Text(
+                            'QR',
+                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.blue),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${pet['breed']} • ${pet['age']} years',
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    pet['color'],
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Owner: ${pet['owner']}',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Reg: ${pet['registrationDate']}',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  const Spacer(),
+                  OutlinedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.visibility, size: 14),
+                    label: const Text('View'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: isActive
+          ? BoxDecoration(
+              color: const Color(0xFF5A9B7E),
+              borderRadius: BorderRadius.circular(8),
+            )
+          : null,
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isActive ? Colors.white : Colors.grey,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.black,
+            fontSize: 13,
+          ),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+
+class PetAdoptionPage extends StatefulWidget {
+  const PetAdoptionPage({super.key, this.onNavigate});
+
+  final Function(String)? onNavigate;
+
+  @override
+  State<PetAdoptionPage> createState() => _PetAdoptionPageState();
+}
+
+class _PetAdoptionPageState extends State<PetAdoptionPage> {
+  String searchQuery = '';
+  String statusFilter = 'all';
+
+  final List<Map<String, dynamic>> adoptions = [
+    {
+      'name': 'Max',
+      'type': 'Dog',
+      'breed': 'Labrador',
+      'age': 2,
+      'color': 'Black',
+      'status': 'pending',
+      'requester': 'Alice Brown',
+      'description': 'Friendly and energetic dog looking for a loving home',
+      'icon': '🐕',
+    },
+    {
+      'name': 'Charlie',
+      'type': 'Dog',
+      'breed': 'Golden Retriever',
+      'age': 3,
+      'color': 'Golden',
+      'status': 'pending',
+      'requester': 'Bob Wilson',
+      'description': 'Gentle and affectionate companion',
+      'icon': '🐕',
+    },
+    {
+      'name': 'Whiskers',
+      'type': 'Cat',
+      'breed': 'Persian',
+      'age': 1,
+      'color': 'White',
+      'status': 'approved',
+      'requester': 'Carol Davis',
+      'description': 'Playful kitten ready for adoption',
+      'icon': '🐱',
+    },
+  ];
+
+  List<Map<String, dynamic>> get filteredAdoptions {
+    var list = adoptions;
+    if (searchQuery.isNotEmpty) {
+      final q = searchQuery.toLowerCase();
+      list = list.where((a) {
+        return a['name'].toString().toLowerCase().contains(q) ||
+            a['breed'].toString().toLowerCase().contains(q) ||
+            a['requester'].toString().toLowerCase().contains(q);
+      }).toList();
+    }
+    if (statusFilter != 'all') {
+      list = list.where((a) => a['status'] == statusFilter).toList();
+    }
+    return list;
+  }
+
+  Map<String, List<Map<String, dynamic>>> get byStatus {
+    final Map<String, List<Map<String, dynamic>>> map = {};
+    for (var a in filteredAdoptions) {
+      final s = a['status'] as String;
+      map.putIfAbsent(s, () => []);
+      map[s]!.add(a);
+    }
+    return map;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          // Sidebar
+          SizedBox(
+            width: 250,
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5A9B7E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.pets, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('PawVera Admin', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text('Platform Management', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        _buildNavItem(icon: Icons.dashboard, label: 'Dashboard', isActive: false, onTap: () => widget.onNavigate?.call('dashboard')),
+                        _buildNavItem(icon: Icons.people, label: 'Users', isActive: false, onTap: () => widget.onNavigate?.call('users')),
+                        _buildNavItem(icon: Icons.store, label: 'Pet Supplies Stores', isActive: false, onTap: () => widget.onNavigate?.call('stores')),
+                        _buildNavItem(icon: Icons.business, label: 'Service Provider Shops', isActive: false, onTap: () => widget.onNavigate?.call('services')),
+                        _buildNavItem(icon: Icons.category, label: 'Pet Types', isActive: false, onTap: () => widget.onNavigate?.call('types')),
+                        _buildNavItem(icon: Icons.pets, label: 'Pets', isActive: false, onTap: () => widget.onNavigate?.call('pets')),
+                        _buildNavItem(icon: Icons.favorite, label: 'Pet Adoption', isActive: true, onTap: () {}),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Main content
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Pet Adoption', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      Row(
+                        children: [
+                          const Icon(Icons.account_circle, color: Colors.grey),
+                          const SizedBox(width: 12),
+                          const Icon(Icons.notifications, color: Colors.grey),
+                          const SizedBox(width: 16),
+                          Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4)), child: const Text('Admin', style: TextStyle(fontSize: 12))),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                onChanged: (v) => setState(() => searchQuery = v),
+                                decoration: InputDecoration(hintText: 'Search by name, breed, or requester', prefixIcon: const Icon(Icons.search), border: OutlineInputBorder(borderRadius: BorderRadius.circular(4))),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            DropdownButton<String>(
+                              value: statusFilter,
+                              items: const [
+                                DropdownMenuItem(value: 'all', child: Text('All Statuses')),
+                                DropdownMenuItem(value: 'pending', child: Text('Pending Approval')),
+                                DropdownMenuItem(value: 'approved', child: Text('Approved')),
+                              ],
+                              onChanged: (v) => setState(() => statusFilter = v ?? 'all'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        if (byStatus.containsKey('pending')) ...[
+                          Text('Pending Approval (${byStatus['pending']!.length})', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
+                          GridView.count(
+                            crossAxisCount: 3,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 1.3,
+                            children: byStatus['pending']!.map((a) => _adoptionCard(a, true)).toList(),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                        if (byStatus.containsKey('approved')) ...[
+                          Text('Approved Listings (${byStatus['approved']!.length})', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
+                          GridView.count(
+                            crossAxisCount: 3,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 1.3,
+                            children: byStatus['approved']!.map((a) => _adoptionCard(a, false)).toList(),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _adoptionCard(Map<String, dynamic> a, bool pending) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: pending ? Colors.orange : Colors.grey[300]!, width: pending ? 2 : 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: pending ? Colors.orange[50] : Colors.grey[50],
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(a['icon'], style: const TextStyle(fontSize: 24)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: pending ? Colors.orange[100] : Colors.green[100],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(pending ? 'Pending' : 'Approved', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: pending ? Colors.orange : Colors.green)),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(a['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 6),
+                Text('${a['type']} • ${a['breed']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const SizedBox(height: 4),
+                Text('${a['age']} years • ${a['color']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const SizedBox(height: 8),
+                Text('Requester: ${a['requester']}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 4),
+                Text(a['description'], maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const SizedBox(height: 8),
+                if (pending)
+                  Row(
+                    children: [
+                      IconButton(icon: const Icon(Icons.check_circle, color: Colors.green, size: 20), onPressed: () {}),
+                      const SizedBox(width: 8),
+                      IconButton(icon: const Icon(Icons.cancel, color: Colors.red, size: 20), onPressed: () {}),
+                    ],
+                  )
+                else
+                  OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.visibility, size: 14), label: const Text('View')),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({required IconData icon, required String label, required bool isActive, required VoidCallback onTap}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: isActive ? BoxDecoration(color: const Color(0xFF5A9B7E), borderRadius: BorderRadius.circular(8)) : null,
+      child: ListTile(
+        leading: Icon(icon, color: isActive ? Colors.white : Colors.grey),
+        title: Text(label, style: TextStyle(color: isActive ? Colors.white : Colors.black, fontSize: 13)),
+        onTap: onTap,
+      ),
+    );
+  }
+
+}
+
+
 class PetSuppliesStoresPage extends StatefulWidget {
   const PetSuppliesStoresPage({super.key, this.onNavigate});
 
