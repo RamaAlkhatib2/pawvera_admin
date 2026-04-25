@@ -34,6 +34,26 @@ class _MainAppState extends State<MainApp> {
         return UsersPage(onNavigate: (page) {
           setState(() => currentPage = page);
         });
+      case 'stores':
+        return PetSuppliesStoresPage(onNavigate: (page) {
+          setState(() => currentPage = page);
+        });
+      case 'services':
+        return ServiceProvidersShopsPage(onNavigate: (page) {
+          setState(() => currentPage = page);
+        });
+      case 'types':
+        return PetTypesPage(onNavigate: (page) {
+          setState(() => currentPage = page);
+        });
+      case 'pets':
+        return PetsPage(onNavigate: (page) {
+          setState(() => currentPage = page);
+        });
+      case 'adoption':
+        return PetAdoptionPage(onNavigate: (page) {
+          setState(() => currentPage = page);
+        });
       default:
         return DashboardPage(onNavigate: (page) {
           setState(() => currentPage = page);
@@ -343,6 +363,7 @@ class DashboardPage extends StatelessWidget {
                           shrinkWrap: true,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
+                          childAspectRatio: 1.6,
                           physics: const NeverScrollableScrollPhysics(),
                           children: [
                             _buildStatCard(
@@ -641,35 +662,36 @@ class DashboardPage extends StatelessWidget {
     required String value,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            width: 50,
-            height: 50,
+            width: 45,
+            height: 45,
             decoration: BoxDecoration(
               color: iconColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: iconColor),
+            child: Icon(icon, color: iconColor, size: 24),
           ),
+          const SizedBox(height: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 title,
                 style: const TextStyle(
@@ -1427,6 +1449,1879 @@ class _UsersPageState extends State<UsersPage> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: isActive
+          ? BoxDecoration(
+              color: const Color(0xFF5A9B7E),
+              borderRadius: BorderRadius.circular(8),
+            )
+          : null,
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isActive ? Colors.white : Colors.grey,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.black,
+            fontSize: 13,
+          ),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class PetSuppliesStoresPage extends StatefulWidget {
+  const PetSuppliesStoresPage({super.key, this.onNavigate});
+
+  final Function(String)? onNavigate;
+
+  @override
+  State<PetSuppliesStoresPage> createState() => _PetSuppliesStoresPageState();
+}
+
+class _PetSuppliesStoresPageState extends State<PetSuppliesStoresPage> {
+  String searchQuery = '';
+  String statusFilter = 'All Statuses';
+
+  final List<Map<String, dynamic>> stores = [
+    {
+      'name': 'Pet Supplies Plus',
+      'status': 'Active',
+      'owner': 'John Anderson',
+      'email': 'john@petsupplies.com',
+      'location': 'Online Store',
+      'commission': '15%',
+      'products': 245,
+      'orders': 156,
+      'icon': Icons.shopping_bag,
+    },
+    {
+      'name': 'Furry Friends Store',
+      'status': 'Active',
+      'owner': 'Sarah Lee',
+      'email': 'sarah@furryfriends.com',
+      'location': 'East Mall, Suite 100',
+      'commission': '12%',
+      'products': 180,
+      'orders': 89,
+      'icon': Icons.shopping_bag,
+    },
+  ];
+
+  List<Map<String, dynamic>> get filteredStores {
+    return stores
+        .where((store) {
+          final matchesSearch = store['name']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()) ||
+              store['owner']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase());
+          final matchesStatus = statusFilter == 'All Statuses' ||
+              store['status'].toString() == statusFilter;
+          return matchesSearch && matchesStatus;
+        })
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          // Sidebar
+          SizedBox(
+            width: 250,
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5A9B7E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.pets, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'PawVera Admin',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Platform Management',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  // Navigation Items
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        _buildNavItem(
+                          icon: Icons.dashboard,
+                          label: 'Dashboard',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('dashboard'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.people,
+                          label: 'Users',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('users'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.store,
+                          label: 'Pet Supplies Stores',
+                          isActive: true,
+                          onTap: () => widget.onNavigate?.call('stores'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.health_and_safety,
+                          label: 'Service Providers Shops',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('services'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.local_hospital,
+                          label: 'Clinics',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('clinics'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.category,
+                          label: 'Pet Types',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('types'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.favorite,
+                          label: 'Pets',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('pets'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.favorite_border,
+                          label: 'Pet Adoption',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('adoption'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.qr_code,
+                          label: 'QR Tags',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('qrtags'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.notifications,
+                          label: 'Reminders',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('reminders'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.phone_iphone,
+                          label: 'Mobile App Preview',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('preview'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.history,
+                          label: 'Audit Logs',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('logs'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Help Section
+                  Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4E8E4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Need Help?',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Check our documentation',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              'View Docs',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Main Content
+          Expanded(
+            child: Container(
+              color: const Color(0xFFF5F5F5),
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // Search Bar
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search users, pets, or records...',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Notification Icon
+                        Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.notifications_none),
+                              onPressed: () {},
+                            ),
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        // Admin User
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: const [
+                                Text(
+                                  'Admin User',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'admin@pawvera.com',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF5A9B7E),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Content
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        // Page Title
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Pet Supplies Stores',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Manage pet supplies stores and their product inventory.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Search and Filter and Add Button
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                onChanged: (value) {
+                                  setState(() => searchQuery = value);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Search stores...',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    borderSide: const BorderSide(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: DropdownButton<String>(
+                                value: statusFilter,
+                                underline: const SizedBox(),
+                                items: [
+                                  'All Statuses',
+                                  'Active',
+                                  'Inactive',
+                                ]
+                                    .map((status) => DropdownMenuItem(
+                                          value: status,
+                                          child: Text(status),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() =>
+                                      statusFilter = value ?? 'All Statuses');
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add Store'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Stores List
+                        Column(
+                          children: filteredStores
+                              .map((store) => _buildStoreCard(store))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStoreCard(Map<String, dynamic> store) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      store['icon'],
+                      color: const Color(0xFF5A9B7E),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            store['name'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              store['status'],
+                              style: TextStyle(
+                                color: Colors.green.shade700,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Owner: ${store['owner']}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.email,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            store['email'],
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            store['location'],
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.percent,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Commission: ${store['commission']}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.more_vert, size: 20),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Text(
+                'Products: ${store['products']}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 24),
+              Text(
+                'Orders: ${store['orders']}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: isActive
+          ? BoxDecoration(
+              color: const Color(0xFF5A9B7E),
+              borderRadius: BorderRadius.circular(8),
+            )
+          : null,
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isActive ? Colors.white : Colors.grey,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.black,
+            fontSize: 13,
+          ),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class ServiceProvidersShopsPage extends StatefulWidget {
+  const ServiceProvidersShopsPage({super.key, this.onNavigate});
+
+  final Function(String)? onNavigate;
+
+  @override
+  State<ServiceProvidersShopsPage> createState() =>
+      _ServiceProvidersShopsPageState();
+}
+
+class _ServiceProvidersShopsPageState extends State<ServiceProvidersShopsPage> {
+  String searchQuery = '';
+
+  final List<Map<String, dynamic>> shops = [
+    {
+      'name': 'Pawfect Spa',
+      'category': 'Grooming',
+      'status': 'Active',
+      'owner': 'Emma Wilson',
+      'email': 'emma@pawfectspa.com',
+      'location': 'Downtown Plaza',
+      'bookings': 78,
+      'icon': Icons.cut,
+    },
+    {
+      'name': 'Happy Tails Training',
+      'category': 'Training',
+      'status': 'Active',
+      'owner': 'Mike Brown',
+      'email': 'mike@happytails.com',
+      'location': 'Park Avenue',
+      'bookings': 45,
+      'icon': Icons.school,
+    },
+  ];
+
+  List<Map<String, dynamic>> get filteredShops {
+    return shops
+        .where((shop) {
+          final matchesSearch = shop['name']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()) ||
+              shop['owner']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()) ||
+              shop['category']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase());
+          return matchesSearch;
+        })
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          // Sidebar
+          SizedBox(
+            width: 250,
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5A9B7E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.pets, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'PawVera Admin',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Platform Management',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  // Navigation Items
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        _buildNavItem(
+                          icon: Icons.dashboard,
+                          label: 'Dashboard',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('dashboard'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.people,
+                          label: 'Users',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('users'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.store,
+                          label: 'Pet Supplies Stores',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('stores'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.health_and_safety,
+                          label: 'Service Providers Shops',
+                          isActive: true,
+                          onTap: () => widget.onNavigate?.call('services'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.local_hospital,
+                          label: 'Clinics',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('clinics'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.category,
+                          label: 'Pet Types',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('types'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.favorite,
+                          label: 'Pets',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('pets'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.favorite_border,
+                          label: 'Pet Adoption',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('adoption'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.qr_code,
+                          label: 'QR Tags',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('qrtags'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.notifications,
+                          label: 'Reminders',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('reminders'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.phone_iphone,
+                          label: 'Mobile App Preview',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('preview'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.history,
+                          label: 'Audit Logs',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('logs'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Help Section
+                  Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4E8E4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Need Help?',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Check our documentation',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              'View Docs',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Main Content
+          Expanded(
+            child: Container(
+              color: const Color(0xFFF5F5F5),
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // Search Bar
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search users, pets, or records...',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Notification Icon
+                        Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.notifications_none),
+                              onPressed: () {},
+                            ),
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        // Admin User
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: const [
+                                Text(
+                                  'Admin User',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'admin@pawvera.com',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF5A9B7E),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Content
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        // Page Title
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Service Providers Shops',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Manage pet care service providers shops and their offerings.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Search and Add Button
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                onChanged: (value) {
+                                  setState(() => searchQuery = value);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Search shops, owners, categories...',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    borderSide: const BorderSide(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add Shop'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Shops List
+                        Column(
+                          children: filteredShops
+                              .map((shop) => _buildShopCard(shop))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShopCard(Map<String, dynamic> shop) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      shop['icon'],
+                      color: const Color(0xFF5A9B7E),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            shop['name'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              shop['category'],
+                              style: TextStyle(
+                                color: Colors.grey.shade700,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          shop['status'],
+                          style: TextStyle(
+                            color: Colors.green.shade700,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.person,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Owner: ${shop['owner']}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.email,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            shop['email'],
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            shop['location'],
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Bookings: ${shop['bookings']}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.more_vert, size: 20),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              OutlinedButton(
+                onPressed: () {},
+                child: const Text('Deactivate'),
+              ),
+              const SizedBox(width: 12),
+              IconButton(
+                icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: isActive
+          ? BoxDecoration(
+              color: const Color(0xFF5A9B7E),
+              borderRadius: BorderRadius.circular(8),
+            )
+          : null,
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isActive ? Colors.white : Colors.grey,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.black,
+            fontSize: 13,
+          ),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class PetTypesPage extends StatefulWidget {
+  const PetTypesPage({super.key, this.onNavigate});
+
+  final Function(String)? onNavigate;
+
+  @override
+  State<PetTypesPage> createState() => _PetTypesPageState();
+}
+
+class _PetTypesPageState extends State<PetTypesPage> {
+  String searchQuery = '';
+  String classificationFilter = 'All Classifications';
+  String statusFilter = 'All Statuses';
+
+  final List<Map<String, dynamic>> petTypes = [
+    {
+      'name': 'Dog',
+      'classification': 'Dog',
+      'status': 'Active',
+      'description': 'Domesticated canine companion',
+      'store': 'Pet Store A',
+      'breeds': ['Labrador Retriever', 'Golden Retriever', 'German Shepherd', 'Bulldog', 'Poodle'],
+      'icon': '🐕',
+    },
+    {
+      'name': 'Cat',
+      'classification': 'Cat',
+      'status': 'Active',
+      'description': 'Domesticated feline companion',
+      'store': 'Pet Store B',
+      'breeds': ['Persian', 'Maine Coon', 'Siamese', 'British Shorthair', 'Ragdoll'],
+      'icon': '🐈',
+    },
+  ];
+
+  List<Map<String, dynamic>> get filteredPetTypes {
+    return petTypes
+        .where((type) {
+          final matchesSearch = type['name']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase()) ||
+              type['description']
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchQuery.toLowerCase());
+          final matchesClassification = classificationFilter == 'All Classifications' ||
+              type['classification'].toString() == classificationFilter;
+          final matchesStatus = statusFilter == 'All Statuses' ||
+              type['status'].toString() == statusFilter;
+          return matchesSearch && matchesClassification && matchesStatus;
+        })
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          // Sidebar
+          SizedBox(
+            width: 250,
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5A9B7E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.pets, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'PawVera Admin',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Platform Management',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  // Navigation Items
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        _buildNavItem(
+                          icon: Icons.dashboard,
+                          label: 'Dashboard',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('dashboard'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.people,
+                          label: 'Users',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('users'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.store,
+                          label: 'Pet Supplies Stores',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('stores'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.health_and_safety,
+                          label: 'Service Providers Shops',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('services'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.local_hospital,
+                          label: 'Clinics',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('clinics'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.category,
+                          label: 'Pet Types',
+                          isActive: true,
+                          onTap: () => widget.onNavigate?.call('types'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.favorite,
+                          label: 'Pets',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('pets'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.favorite_border,
+                          label: 'Pet Adoption',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('adoption'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.qr_code,
+                          label: 'QR Tags',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('qrtags'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.notifications,
+                          label: 'Reminders',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('reminders'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.phone_iphone,
+                          label: 'Mobile App Preview',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('preview'),
+                        ),
+                        _buildNavItem(
+                          icon: Icons.history,
+                          label: 'Audit Logs',
+                          isActive: false,
+                          onTap: () => widget.onNavigate?.call('logs'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Help Section
+                  Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4E8E4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Need Help?',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Check our documentation',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              'View Docs',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Main Content
+          Expanded(
+            child: Container(
+              color: const Color(0xFFF5F5F5),
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // Search Bar
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search users, pets, or records...',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Notification Icon
+                        Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.notifications_none),
+                              onPressed: () {},
+                            ),
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        // Admin User
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: const [
+                                Text(
+                                  'Admin User',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'admin@pawvera.com',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF5A9B7E),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Content
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        // Page Title
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Pet Types Management',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Manage pet species and their default breeds',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Search and Filters and Add Button
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: TextField(
+                                onChanged: (value) {
+                                  setState(() => searchQuery = value);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Search pet types...',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    borderSide: const BorderSide(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: DropdownButton<String>(
+                                value: classificationFilter,
+                                underline: const SizedBox(),
+                                items: [
+                                  'All Classifications',
+                                  'Dog',
+                                  'Cat',
+                                  'Bird',
+                                  'Rabbit',
+                                ]
+                                    .map((filter) => DropdownMenuItem(
+                                          value: filter,
+                                          child: Text(filter),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() =>
+                                      classificationFilter = value ?? 'All Classifications');
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: DropdownButton<String>(
+                                value: statusFilter,
+                                underline: const SizedBox(),
+                                items: [
+                                  'All Statuses',
+                                  'Active',
+                                  'Inactive',
+                                ]
+                                    .map((status) => DropdownMenuItem(
+                                          value: status,
+                                          child: Text(status),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() =>
+                                      statusFilter = value ?? 'All Statuses');
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add Pet Type'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Pet Types List
+                        Column(
+                          children: filteredPetTypes
+                              .map((petType) => _buildPetTypeCard(petType))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPetTypeCard(Map<String, dynamic> petType) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                petType['icon'],
+                style: const TextStyle(fontSize: 32),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          petType['name'],
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            petType['classification'],
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            petType['status'],
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      petType['description'],
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Store: ${petType['store']}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Default Breeds:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: (petType['breeds'] as List<String>)
+                    .map((breed) => Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            breed,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              OutlinedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.edit, size: 16),
+                label: const Text('Edit'),
+              ),
+              const SizedBox(width: 12),
+              IconButton(
+                icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+                onPressed: () {},
+              ),
+            ],
           ),
         ],
       ),
