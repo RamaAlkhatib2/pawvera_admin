@@ -1276,27 +1276,128 @@ class PetAdoptionPage extends StatefulWidget {
 
 class _PetAdoptionPageState extends State<PetAdoptionPage> {
   String q = '';
+  String statusFilter = 'All Statuses';
+
   final apps = [
-    {'name': 'Max', 'status': 'pending'},
-    {'name': 'Whiskers', 'status': 'approved'},
+    {
+      'name': 'Max',
+      'type': 'Dog',
+      'breed': 'Labrador',
+      'age': '2 years',
+      'owner': 'Alice Brown',
+      'desc': 'Friendly and energetic dog looking for a loving home',
+      'status': 'pending'
+    },
+    {
+      'name': 'Charlie',
+      'type': 'Dog',
+      'breed': 'Golden Retriever',
+      'age': '1 years',
+      'owner': 'Carol Davis',
+      'desc': 'Playful puppy needs an active family',
+      'status': 'pending'
+    },
+    {
+      'name': 'Whiskers',
+      'type': 'Cat',
+      'breed': 'Persian',
+      'age': '3 years',
+      'owner': 'Samantha Grey',
+      'desc': 'Calm indoor cat, great with kids',
+      'status': 'approved'
+    }
   ];
+
+  void _approve(Map<String, String> app) {
+    setState(() {
+      final idx = apps.indexOf(app);
+      if (idx != -1) apps[idx]['status'] = 'approved';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Application approved')));
+  }
+
+  void _reject(Map<String, String> app) {
+    setState(() {
+      final idx = apps.indexOf(app);
+      if (idx != -1) apps[idx]['status'] = 'rejected';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Application rejected')));
+  }
+
+  Widget _buildCard(Map<String, String> a, {required bool pending}) {
+    final border = pending
+        ? Border.all(color: const Color(0xFFFFD24D))
+        : Border.all(color: Colors.grey.shade200);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: border),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Text(a['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(width: 8),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(8)), child: Text(a['type']!, style: const TextStyle(fontSize: 12))),
+              const SizedBox(width: 8),
+              if (pending) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: const Color(0xFFFFF2D6), borderRadius: BorderRadius.circular(12)), child: Text('Pending', style: const TextStyle(fontSize: 12, color: Color(0xFFB37B00)))) else if (a['status'] == 'approved') Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: const Color(0xFFEFFAF1), borderRadius: BorderRadius.circular(12)), child: Text('Approved', style: const TextStyle(fontSize: 12, color: Color(0xFF2F9C76)))),
+            ]),
+            const SizedBox(height: 8),
+            Text('${a['breed']} • ${a['age']}', style: TextStyle(color: Colors.grey.shade700)),
+            const SizedBox(height: 6),
+            Text('By ${a['owner']}', style: TextStyle(color: Colors.grey.shade700)),
+            const SizedBox(height: 8),
+            Text(a['desc']!, style: TextStyle(color: Colors.grey.shade700)),
+            const SizedBox(height: 12),
+            TextButton.icon(onPressed: () {}, icon: const Icon(Icons.remove_red_eye, size: 18), label: const Text('View Details'))
+          ]),
+        ),
+        Column(children: [
+          if (pending)
+            Row(children: [
+              ElevatedButton(onPressed: () => _approve(a as Map<String, String>), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2F9C76)), child: const Row(children: [Icon(Icons.check, size: 16), SizedBox(width: 8), Text('Approve')])),
+              const SizedBox(width: 8),
+              ElevatedButton(onPressed: () => _reject(a as Map<String, String>), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD93D3D)), child: const Row(children: [Icon(Icons.close, size: 16), SizedBox(width: 8), Text('Reject')])),
+            ])
+        ])
+      ]),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = apps.where((a) => a['name']!.toLowerCase().contains(q.toLowerCase())).toList();
+    final qLower = q.toLowerCase();
+    final filtered = apps.where((a) => a['name']!.toLowerCase().contains(qLower) || a['breed']!.toLowerCase().contains(qLower) || a['owner']!.toLowerCase().contains(qLower)).toList();
+    final pending = filtered.where((a) => a['status'] == 'pending').toList();
+    final approved = filtered.where((a) => a['status'] == 'approved').toList();
+
     return PageScaffold(
-      title: 'Pet Adoption',
+      title: 'Adoption Listings',
       onNavigate: widget.onNavigate,
-      child: Column(children: [
-        Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)), child: Row(children: [Expanded(child: TextField(onChanged: (v) => setState(() => q = v), decoration: const InputDecoration(hintText: 'Search adoptions...', prefixIcon: Icon(Icons.search), border: InputBorder.none))), ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.add), label: const Text('New Request'))])),
-        const SizedBox(height: 16),
-        for (var a in filtered)
-          Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-            child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(a['name']!, style: const TextStyle(fontWeight: FontWeight.bold)), Text('Status: ${a['status']}', style: const TextStyle(color: Colors.grey))])), if (a['status'] == 'pending') Row(children: [TextButton(onPressed: () {}, child: const Text('Approve')), TextButton(onPressed: () {}, child: const Text('Reject'))])]),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Manage pet adoption requests and approvals', style: TextStyle(color: Colors.grey)),
+        const SizedBox(height: 12),
+
+        // Search + filter row
+        Row(children: [
+          Expanded(
+            child: TextField(onChanged: (v) => setState(() => q = v), decoration: InputDecoration(hintText: 'Search by name, breed, or owner', prefixIcon: const Icon(Icons.search), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)), contentPadding: const EdgeInsets.symmetric(vertical: 12))),
           ),
+          const SizedBox(width: 12),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(8)), child: DropdownButton<String>(value: statusFilter, underline: const SizedBox.shrink(), items: const [DropdownMenuItem(value: 'All Statuses', child: Text('All Statuses')), DropdownMenuItem(value: 'Pending', child: Text('Pending')), DropdownMenuItem(value: 'Approved', child: Text('Approved'))], onChanged: (v) => setState(() => statusFilter = v ?? 'All Statuses'))),
+        ]),
+
+        const SizedBox(height: 18),
+
+        // Pending section
+        Text('Pending Approval (${pending.length})', style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        for (var a in pending) _buildCard(a as Map<String, String>, pending: true),
+
+        const SizedBox(height: 12),
+        Text('Approved Listings (${approved.length})', style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        for (var a in approved) _buildCard(a as Map<String, String>, pending: false),
       ]),
     );
   }
