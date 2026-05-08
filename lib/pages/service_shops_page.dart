@@ -401,7 +401,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: 'Services Providers',
+      title: 'Add Provider',
       onNavigate: widget.onNavigate,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
