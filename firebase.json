@@ -1,1 +1,18 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"pawvera-3578f","configurations":{"web":"1:935933039172:web:022731a72a48132f8fe211"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "pawvera-3578f",
+          "configurations": {
+            "web": "1:935933039172:web:022731a72a48132f8fe211"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

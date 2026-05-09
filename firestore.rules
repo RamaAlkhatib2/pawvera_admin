@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── /users/{uid} ─────────────────────────────────────────────
+    // Dev mode: admin panel has no auth yet — open to all.
+    // TODO: lock down once admin login is added.
+    match /users/{uid} {
+      allow read, write: if true;
+    }
+
+    // ── /admins/{uid} ────────────────────────────────────────────
+    match /admins/{uid} {
+      allow read, write: if true;
+    }
+
+    // ── deny everything else ─────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

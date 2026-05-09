@@ -98,8 +98,13 @@ class AppSidebar extends StatelessWidget {
                   ),
                   _navItem(
                     icon: Icons.health_and_safety,
-                    label: 'Service Providers Shops',
+                    label: 'Services Providers',
                     page: 'services',
+                  ),
+                  _navItem(
+                    icon: Icons.storefront,
+                    label: 'Service Provider Shops',
+                    page: 'providerShops',
                   ),
                   _navItem(
                     icon: Icons.local_hospital,

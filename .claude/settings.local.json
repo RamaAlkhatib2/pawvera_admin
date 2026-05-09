@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --prefix .firebase-cli-temp firebase-tools deploy --only firestore)",
+      "Bash(.firebase-cli-temp\\\\node_modules\\\\.bin\\\\firebase deploy *)"
+    ]
+  }
+}

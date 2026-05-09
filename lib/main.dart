@@ -14,6 +14,7 @@ import 'pages/pet_adoption_page.dart';
 import 'pages/qr_tags_page.dart';
 import 'pages/reminders_page.dart';
 import 'pages/audit_logs_page.dart';
+import 'pages/provider_shops_list_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -109,6 +110,8 @@ class _MainAppState extends State<MainApp> {
         return StoresPage(onNavigate: _navigate);
       case 'services':
         return ServiceShopsPage(onNavigate: _navigate);
+      case 'providerShops':
+        return ProviderShopsListPage(onNavigate: _navigate);
       case 'clinics':
         return const SimplePage(title: 'Clinics');
       case 'types':
