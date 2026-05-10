@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/page_scaffold.dart';
 
 class UsersPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const UsersPage({Key? key, required this.onNavigate}) : super(key: key);
+  const UsersPage({super.key, required this.onNavigate});
 
   @override
   State<UsersPage> createState() => _UsersPageState();
@@ -13,65 +14,24 @@ class _UsersPageState extends State<UsersPage> {
   String search = '';
   String statusFilter = 'All Status';
 
-  final users = [
-    {
-      'name': 'Sarah Johnson',
-      'email': 'sarah.j@email.com',
-      'phone': '+1 (555) 123-4567',
-      'location': 'New York, NY',
-      'pets': '2 pets',
-      'joined': '1/15/2024',
-      'status': 'active',
-    },
-    {
-      'name': 'Mike Chen',
-      'email': 'mike.chen@email.com',
-      'phone': '+1 (555) 234-5678',
-      'location': 'San Francisco, CA',
-      'pets': '1 pet',
-      'joined': '2/20/2024',
-      'status': 'active',
-    },
-    {
-      'name': 'Emma Davis',
-      'email': 'emma.d@email.com',
-      'phone': '+1 (555) 345-6789',
-      'location': 'Austin, TX',
-      'pets': '3 pets',
-      'joined': '3/10/2024',
-      'status': 'active',
-    },
-    {
-      'name': 'James Wilson',
-      'email': 'j.wilson@email.com',
-      'phone': '+1 (555) 456-7890',
-      'location': 'Seattle, WA',
-      'pets': '1 pet',
-      'joined': '12/5/2023',
-      'status': 'inactive',
-    },
-    {
-      'name': 'Lisa Anderson',
-      'email': 'lisa.a@email.com',
-      'phone': '+1 (555) 567-8901',
-      'location': 'Boston, MA',
-      'pets': '2 pets',
-      'joined': '4/22/2024',
-      'status': 'active',
-    },
-  ];
+  String _formatDate(dynamic value) {
+    if (value == null) return '—';
+    if (value is Timestamp) {
+      final d = value.toDate();
+      return '${d.month}/${d.day}/${d.year}';
+    }
+    return value.toString();
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '?';
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    return (parts.first[0] + parts.last[0]).toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = users
-        .where(
-          (u) =>
-              u['name']!.toLowerCase().contains(search.toLowerCase()) &&
-              (statusFilter == 'All Status' ||
-                  u['status'] == statusFilter.toLowerCase()),
-        )
-        .toList();
-
     return PageScaffold(
       title: 'User Management',
       onNavigate: widget.onNavigate,
@@ -170,13 +130,6 @@ class _UsersPageState extends State<UsersPage> {
                     Expanded(
                       flex: 1,
                       child: Text(
-                        'Pets',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
                         'Joined',
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
@@ -188,151 +141,237 @@ class _UsersPageState extends State<UsersPage> {
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                     ),
-                    SizedBox(width: 40, child: Text('')),
+                    const SizedBox(width: 40),
                   ],
                 ),
 
                 const SizedBox(height: 8),
 
-                Column(
-                  children: [
-                    for (var u in filtered)
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: Color(0xFFF0F0F0)),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .orderBy('createdAt', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.all(48),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFECEC),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Error loading users: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      );
+                    }
+
+                    final allDocs = snapshot.data?.docs ?? [];
+
+                    final filtered = allDocs.where((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      final role = data['role'] as String? ?? '';
+                      if (role == 'provider') return false;
+
+                      final name = (data['name'] as String? ??
+                              data['displayName'] as String? ??
+                              '')
+                          .toLowerCase();
+                      final email =
+                          (data['email'] as String? ?? '').toLowerCase();
+                      final q = search.toLowerCase();
+                      final matchesSearch =
+                          name.contains(q) || email.contains(q);
+
+                      final isActive = data['isActive'] as bool? ?? true;
+                      final matchesStatus = statusFilter == 'All Status' ||
+                          (statusFilter == 'active' && isActive) ||
+                          (statusFilter == 'inactive' && !isActive);
+
+                      return matchesSearch && matchesStatus;
+                    }).toList();
+
+                    if (filtered.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 48),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 48,
+                                color: Colors.grey.shade300,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                allDocs.isEmpty
+                                    ? 'No users found in the database.'
+                                    : 'No users match your search.',
+                                style: TextStyle(color: Colors.grey.shade500),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: const Color(0xFFB39DDB),
-                                    child: Text(
-                                      u['name']!
-                                          .split(' ')
-                                          .map((s) => s[0])
-                                          .take(2)
-                                          .join(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                      );
+                    }
+
+                    return Column(
+                      children: filtered.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final name = data['name'] as String? ??
+                            data['displayName'] as String? ??
+                            data['fullName'] as String? ??
+                            'Unknown';
+                        final email = data['email'] as String? ?? '—';
+                        final phone = data['phone'] as String? ??
+                            data['phoneNumber'] as String? ??
+                            '—';
+                        final location = data['location'] as String? ??
+                            data['address'] as String? ??
+                            data['city'] as String? ??
+                            '—';
+                        final joined = _formatDate(data['createdAt']);
+                        final isActive = data['isActive'] as bool? ?? true;
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Color(0xFFF0F0F0)),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor:
+                                          const Color(0xFFB39DDB),
+                                      child: Text(
+                                        _initials(name),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          u['name']!,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          u['email']!,
-                                          style: TextStyle(
-                                            color: Colors.grey.shade600,
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            email,
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
 
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    u['email']!,
-                                    style: TextStyle(
-                                      color: Colors.grey.shade800,
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      email,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade800,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    u['phone']!,
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      phone,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
 
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                u['location']!,
-                                style: TextStyle(color: Colors.grey.shade700),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  location,
+                                  style:
+                                      TextStyle(color: Colors.grey.shade700),
+                                ),
                               ),
-                            ),
 
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                u['pets']!,
-                                style: TextStyle(color: Colors.grey.shade700),
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  joined,
+                                  style:
+                                      TextStyle(color: Colors.grey.shade700),
+                                ),
                               ),
-                            ),
 
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                u['joined']!,
-                                style: TextStyle(color: Colors.grey.shade700),
-                              ),
-                            ),
-
-                            Expanded(
-                              flex: 1,
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: u['status'] == 'active'
-                                        ? const Color(0xFFEFFAF1)
-                                        : const Color(0xFFF3F4F6),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    u['status']!,
-                                    style: TextStyle(
-                                      color: u['status'] == 'active'
-                                          ? const Color(0xFF2F9C76)
-                                          : Colors.grey.shade600,
+                              Expanded(
+                                flex: 1,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? const Color(0xFFEFFAF1)
+                                          : const Color(0xFFF3F4F6),
+                                      borderRadius:
+                                          BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      isActive ? 'active' : 'inactive',
+                                      style: TextStyle(
+                                        color: isActive
+                                            ? const Color(0xFF2F9C76)
+                                            : Colors.grey.shade600,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
 
-                            SizedBox(
-                              width: 40,
-                              child: IconButton(
-                                icon: const Icon(Icons.more_vert),
-                                onPressed: () {},
+                              SizedBox(
+                                width: 40,
+                                child: IconButton(
+                                  icon: const Icon(Icons.more_vert),
+                                  onPressed: () {},
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
               ],
             ),
