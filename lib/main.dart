@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
 import 'widgets/app_sidebar.dart';
@@ -14,7 +15,6 @@ import 'pages/pet_adoption_page.dart';
 import 'pages/qr_tags_page.dart';
 import 'pages/reminders_page.dart';
 import 'pages/audit_logs_page.dart';
-import 'pages/provider_shops_list_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +23,9 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
     runApp(const MainApp());
   } catch (error, stackTrace) {
     runApp(FirebaseSetupErrorApp(error: error, stackTrace: stackTrace));
@@ -111,7 +114,7 @@ class _MainAppState extends State<MainApp> {
       case 'services':
         return ServiceShopsPage(onNavigate: _navigate);
       case 'providerShops':
-        return ProviderShopsListPage(onNavigate: _navigate);
+        return const SimplePage(title: 'Service Provider Shops');
       case 'clinics':
         return const SimplePage(title: 'Clinics');
       case 'types':
