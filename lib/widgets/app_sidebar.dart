@@ -92,14 +92,14 @@ class AppSidebar extends StatelessWidget {
                   ),
                   _navItem(icon: Icons.people, label: 'Users', page: 'users'),
                   _navItem(
+                    icon: Icons.health_and_safety,
+                    label: 'Add Provider',
+                    page: 'services',
+                  ),
+                  _navItem(
                     icon: Icons.store,
                     label: 'Pet Supplies Stores',
                     page: 'stores',
-                  ),
-                  _navItem(
-                    icon: Icons.health_and_safety,
-                    label: 'Services Providers',
-                    page: 'services',
                   ),
                   _navItem(
                     icon: Icons.storefront,
