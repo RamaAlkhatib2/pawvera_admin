@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class PetAdoptionPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const PetAdoptionPage({Key? key, required this.onNavigate}) : super(key: key);
+  const PetAdoptionPage({super.key, required this.onNavigate});
 
   @override
   State<PetAdoptionPage> createState() => _PetAdoptionPageState();
@@ -13,7 +13,7 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
   String q = '';
   String statusFilter = 'All Statuses';
 
-  final apps = [
+  final apps = <Map<String, String>>[
     {
       'name': 'Max',
       'type': 'Dog',
@@ -284,7 +284,7 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
           ),
           const SizedBox(height: 12),
           for (var a in pending)
-            _buildCard(a as Map<String, String>, pending: true),
+            _buildCard(a, pending: true),
 
           const SizedBox(height: 12),
           Text(
@@ -293,7 +293,7 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
           ),
           const SizedBox(height: 12),
           for (var a in approved)
-            _buildCard(a as Map<String, String>, pending: false),
+            _buildCard(a, pending: false),
         ],
       ),
     );
