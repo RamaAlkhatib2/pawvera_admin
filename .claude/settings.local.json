@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(npx --prefix .firebase-cli-temp firebase-tools deploy --only firestore)",
-      "Bash(.firebase-cli-temp\\\\node_modules\\\\.bin\\\\firebase deploy *)"
+      "Bash(.firebase-cli-temp\\\\node_modules\\\\.bin\\\\firebase deploy *)",
+      "Bash(git merge *)",
+      "Bash(git add *)",
+      "Bash(git push *)"
     ]
   }
 }
