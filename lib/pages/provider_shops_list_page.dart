@@ -4,8 +4,7 @@ import '../widgets/page_scaffold.dart';
 
 class ProviderShopsListPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const ProviderShopsListPage({Key? key, required this.onNavigate})
-      : super(key: key);
+  const ProviderShopsListPage({super.key, required this.onNavigate});
 
   @override
   State<ProviderShopsListPage> createState() => _ProviderShopsListPageState();
@@ -54,7 +53,7 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
                   const SizedBox(height: 14),
                   _label('Category'),
                   DropdownButtonFormField<String>(
-                    value: category,
+                    initialValue: category,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(
