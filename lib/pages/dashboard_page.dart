@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class DashboardPage extends StatelessWidget {
   final Function(String) onNavigate;
-  const DashboardPage({Key? key, required this.onNavigate}) : super(key: key);
+  const DashboardPage({super.key, required this.onNavigate});
 
   Widget _statCard(String label, String value, IconData icon, Color color) {
     return Container(

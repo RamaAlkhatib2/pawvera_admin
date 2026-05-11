@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class QrTagsPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const QrTagsPage({Key? key, required this.onNavigate}) : super(key: key);
+  const QrTagsPage({super.key, required this.onNavigate});
 
   @override
   State<QrTagsPage> createState() => _QrTagsPageState();

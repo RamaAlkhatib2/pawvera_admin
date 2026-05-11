@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class RemindersPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const RemindersPage({Key? key, required this.onNavigate}) : super(key: key);
+  const RemindersPage({super.key, required this.onNavigate});
 
   @override
   State<RemindersPage> createState() => _RemindersPageState();
@@ -60,7 +60,7 @@ class _RemindersPageState extends State<RemindersPage> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: cat,
+                initialValue: cat,
                 items: const [
                   DropdownMenuItem(value: 'Health', child: Text('Health')),
                   DropdownMenuItem(value: 'Grooming', child: Text('Grooming')),

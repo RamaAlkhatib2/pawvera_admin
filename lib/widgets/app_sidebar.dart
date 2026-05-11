@@ -5,10 +5,10 @@ class AppSidebar extends StatelessWidget {
   final void Function(String) onNavigate;
 
   const AppSidebar({
-    Key? key,
+    super.key,
     required this.activePage,
     required this.onNavigate,
-  }) : super(key: key);
+  });
 
   Widget _navItem({
     required IconData icon,

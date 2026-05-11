@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class PetTypesPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const PetTypesPage({Key? key, required this.onNavigate}) : super(key: key);
+  const PetTypesPage({super.key, required this.onNavigate});
 
   @override
   State<PetTypesPage> createState() => _PetTypesPageState();
@@ -82,7 +82,7 @@ class _PetTypesPageState extends State<PetTypesPage> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: classificationVal,
+                initialValue: classificationVal,
                 items: const [
                   DropdownMenuItem(value: 'Mammal', child: Text('Mammal')),
                   DropdownMenuItem(value: 'Bird', child: Text('Bird')),
@@ -127,7 +127,7 @@ class _PetTypesPageState extends State<PetTypesPage> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: statusVal,
+                initialValue: statusVal,
                 items: const [
                   DropdownMenuItem(value: 'Active', child: Text('Active')),
                   DropdownMenuItem(value: 'Inactive', child: Text('Inactive')),
@@ -407,7 +407,7 @@ class _PetTypesPageState extends State<PetTypesPage> {
                                             ),
                                             const SizedBox(height: 12),
                                             DropdownButtonFormField<String>(
-                                              value: classVal,
+                                              initialValue: classVal,
                                               items: const [
                                                 DropdownMenuItem(
                                                   value: 'Mammal',
@@ -467,7 +467,7 @@ class _PetTypesPageState extends State<PetTypesPage> {
                                             ),
                                             const SizedBox(height: 12),
                                             DropdownButtonFormField<String>(
-                                              value:
+                                              initialValue:
                                                   stat[0].toUpperCase() +
                                                   stat.substring(1),
                                               items: const [

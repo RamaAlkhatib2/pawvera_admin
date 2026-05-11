@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class AuditLogsPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const AuditLogsPage({Key? key, required this.onNavigate}) : super(key: key);
+  const AuditLogsPage({super.key, required this.onNavigate});
 
   @override
   State<AuditLogsPage> createState() => _AuditLogsPageState();

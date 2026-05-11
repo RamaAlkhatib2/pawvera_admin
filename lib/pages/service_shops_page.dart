@@ -9,7 +9,7 @@ import '../widgets/page_scaffold.dart';
 
 class ServiceShopsPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const ServiceShopsPage({Key? key, required this.onNavigate}) : super(key: key);
+  const ServiceShopsPage({super.key, required this.onNavigate});
 
   @override
   State<ServiceShopsPage> createState() => _ServiceShopsPageState();
@@ -81,7 +81,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: selectedType,
+                    initialValue: selectedType,
                     hint: const Text('Select provider type'),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -279,19 +279,31 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                         final uid = cred.user!.uid;
                         await secondaryApp.delete();
 
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(uid)
-                            .set({
+                        final userDoc = <String, dynamic>{
                           'uid': uid,
                           'email': generatedEmail,
                           'role': 'provider',
                           'providerType': selectedType,
                           'businessName': businessNameCtl.text.trim(),
                           'createdAt': FieldValue.serverTimestamp(),
+                          'updatedAt': FieldValue.serverTimestamp(),
                           'createdBy': 'admin',
                           'isActive': true,
-                        });
+                        };
+                        if (selectedType == 'Pet Supplies Store') {
+                          userDoc.addAll({
+                            'owner': '',
+                            'location': '',
+                            'commission': '0%',
+                            'products': 0,
+                            'orders': 0,
+                          });
+                        }
+
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(uid)
+                            .set(userDoc);
 
                         if (ctx.mounted) Navigator.of(ctx).pop();
                         if (mounted) {
@@ -358,7 +370,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
             style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
           ),
         ),
-        if (trailing != null) trailing,
+        ?trailing,
         IconButton(
           icon: const Icon(Icons.copy, size: 16, color: Colors.grey),
           onPressed: onCopy,
@@ -549,7 +561,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(_iconForType(type), color: color, size: 22),
@@ -576,7 +588,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -654,7 +666,10 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                   await FirebaseFirestore.instance
                       .collection('users')
                       .doc(docId)
-                      .update({'isActive': !isActive});
+                      .update({
+                    'isActive': !isActive,
+                    'updatedAt': FieldValue.serverTimestamp(),
+                  });
                 },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: isActive ? Colors.orange : const Color(0xFF2F9C76),

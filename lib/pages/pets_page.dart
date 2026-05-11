@@ -3,7 +3,7 @@ import '../widgets/page_scaffold.dart';
 
 class PetsPage extends StatefulWidget {
   final Function(String) onNavigate;
-  const PetsPage({Key? key, required this.onNavigate}) : super(key: key);
+  const PetsPage({super.key, required this.onNavigate});
 
   @override
   State<PetsPage> createState() => _PetsPageState();

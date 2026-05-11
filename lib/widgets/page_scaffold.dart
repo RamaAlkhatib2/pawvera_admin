@@ -6,11 +6,11 @@ class PageScaffold extends StatelessWidget {
   final Function(String)? onNavigate;
 
   const PageScaffold({
-    Key? key,
+    super.key,
     required this.title,
     required this.child,
     this.onNavigate,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

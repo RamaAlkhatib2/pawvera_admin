@@ -82,23 +82,40 @@ class _StoresPageState extends State<StoresPage> {
                   ? 'New Store'
                   : nameCtl.text.trim();
 
-              await FirebaseFirestore.instance.collection('users').add({
-                'role': 'provider',
-                'providerType': 'Pet Supplies Store',
-                'businessName': businessName,
-                'owner': ownerCtl.text.trim(),
-                'email': emailCtl.text.trim(),
-                'location': locationCtl.text.trim(),
-                'commission': '0%',
-                'products': 0,
-                'orders': 0,
-                'isActive': true,
-                'createdAt': FieldValue.serverTimestamp(),
-                'createdBy': 'admin',
-              });
+              try {
+                await FirebaseFirestore.instance.collection('users').add({
+                  'role': 'provider',
+                  'providerType': 'Pet Supplies Store',
+                  'businessName': businessName,
+                  'owner': ownerCtl.text.trim(),
+                  'email': emailCtl.text.trim(),
+                  'location': locationCtl.text.trim(),
+                  'commission': '0%',
+                  'products': 0,
+                  'orders': 0,
+                  'isActive': true,
+                  'createdAt': FieldValue.serverTimestamp(),
+                  'updatedAt': FieldValue.serverTimestamp(),
+                  'createdBy': 'admin',
+                });
 
-              if (ctx.mounted) {
-                Navigator.of(ctx).pop();
+                if (ctx.mounted) Navigator.of(ctx).pop();
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Store "$businessName" saved to Firestore'),
+                    backgroundColor: const Color(0xFF2F9C76),
+                  ),
+                );
+              } catch (e) {
+                if (ctx.mounted) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text('Firestore: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             child: const Text('Add Shop'),
@@ -251,7 +268,10 @@ class _StoresPageState extends State<StoresPage> {
               return Column(
                 children: [
                   for (final doc in filtered)
-                    _buildStoreCard(doc.data() as Map<String, dynamic>),
+                    _buildStoreCard(
+                      doc.data() as Map<String, dynamic>,
+                      doc.id,
+                    ),
                 ],
               );
             },
@@ -261,7 +281,274 @@ class _StoresPageState extends State<StoresPage> {
     );
   }
 
-  Widget _buildStoreCard(Map<String, dynamic> s) {
+  Future<void> _openEditStoreDialog(
+    Map<String, dynamic> initial,
+    String docId,
+  ) async {
+    final nameCtl = TextEditingController(
+      text: initial['businessName'] as String? ?? '',
+    );
+    final ownerCtl = TextEditingController(
+      text: initial['owner'] as String? ?? '',
+    );
+    final emailCtl = TextEditingController(
+      text: initial['email'] as String? ?? '',
+    );
+    final locationCtl = TextEditingController(
+      text: initial['location'] as String? ?? '',
+    );
+    final commissionCtl = TextEditingController(
+      text: initial['commission']?.toString() ?? '0%',
+    );
+    final productsCtl = TextEditingController(
+      text: '${initial['products'] ?? 0}',
+    );
+    final ordersCtl = TextEditingController(
+      text: '${initial['orders'] ?? 0}',
+    );
+    bool isSaving = false;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialog) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text('Edit Store'),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Firestore: users/$docId',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Changes sync to this document. Login email in Firebase Authentication is only updated if you change it there for accounts created via Add Provider.',
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 14),
+                  _fieldLabel('Shop name'),
+                  TextField(
+                    controller: nameCtl,
+                    decoration: _inputDecoration('Shop name'),
+                  ),
+                  const SizedBox(height: 12),
+                  _fieldLabel('Owner'),
+                  TextField(
+                    controller: ownerCtl,
+                    decoration: _inputDecoration('Owner name'),
+                  ),
+                  const SizedBox(height: 12),
+                  _fieldLabel('Email'),
+                  TextField(
+                    controller: emailCtl,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: _inputDecoration('Email'),
+                  ),
+                  const SizedBox(height: 12),
+                  _fieldLabel('Location'),
+                  TextField(
+                    controller: locationCtl,
+                    decoration: _inputDecoration('Location'),
+                  ),
+                  const SizedBox(height: 12),
+                  _fieldLabel('Commission'),
+                  TextField(
+                    controller: commissionCtl,
+                    decoration: _inputDecoration('e.g. 15%'),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel('Products'),
+                            TextField(
+                              controller: productsCtl,
+                              keyboardType: TextInputType.number,
+                              decoration: _inputDecoration('0'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel('Orders'),
+                            TextField(
+                              controller: ordersCtl,
+                              keyboardType: TextInputType.number,
+                              decoration: _inputDecoration('0'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isSaving ? null : () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0B233F),
+              ),
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      final businessName = nameCtl.text.trim();
+                      if (businessName.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(content: Text('Shop name is required')),
+                        );
+                        return;
+                      }
+                      final products =
+                          int.tryParse(productsCtl.text.trim()) ?? 0;
+                      final orders = int.tryParse(ordersCtl.text.trim()) ?? 0;
+                      setDialog(() => isSaving = true);
+                      try {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(docId)
+                            .update({
+                          'businessName': businessName,
+                          'owner': ownerCtl.text.trim(),
+                          'email': emailCtl.text.trim(),
+                          'location': locationCtl.text.trim(),
+                          'commission': commissionCtl.text.trim().isEmpty
+                              ? '0%'
+                              : commissionCtl.text.trim(),
+                          'products': products,
+                          'orders': orders,
+                          'updatedAt': FieldValue.serverTimestamp(),
+                        });
+                        if (ctx.mounted) Navigator.of(ctx).pop();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Store "$businessName" updated'),
+                              backgroundColor: const Color(0xFF2F9C76),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        setDialog(() => isSaving = false);
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: isSaving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    nameCtl.dispose();
+    ownerCtl.dispose();
+    emailCtl.dispose();
+    locationCtl.dispose();
+    commissionCtl.dispose();
+    productsCtl.dispose();
+    ordersCtl.dispose();
+  }
+
+  Widget _fieldLabel(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+      );
+
+  InputDecoration _inputDecoration(String hint) => InputDecoration(
+        hintText: hint,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      );
+
+  Future<void> _confirmDeleteStore(String docId, String name) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text('Delete Store'),
+        content: Text(
+          'Are you sure you want to delete "$name"? This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(docId).delete();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Store "$name" deleted'),
+            backgroundColor: const Color(0xFF2F9C76),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Widget _buildStoreCard(Map<String, dynamic> s, String docId) {
     final name = s['businessName'] as String? ?? 'Unnamed Store';
     final owner = s['owner'] as String? ?? 'N/A';
     final email = s['email'] as String? ?? '';
@@ -270,7 +557,9 @@ class _StoresPageState extends State<StoresPage> {
     final products = s['products']?.toString() ?? '0';
     final orders = s['orders']?.toString() ?? '0';
     final isActive = s['isActive'] as bool? ?? true;
-    final statusText = isActive ? 'active' : 'inactive';
+    final lastWrite =
+        s['updatedAt'] as Timestamp? ?? s['createdAt'] as Timestamp?;
+    final statusText = isActive ? 'Active' : 'Inactive';
     final chipBg = isActive ? const Color(0xFFEFFAF1) : const Color(0xFFF3F4F6);
     final chipFg = isActive ? const Color(0xFF2F9C76) : Colors.grey;
 
@@ -338,9 +627,78 @@ class _StoresPageState extends State<StoresPage> {
                   ),
                 ],
               ),
-              IconButton(
+              PopupMenuButton<String>(
+                tooltip: 'Store actions',
                 icon: const Icon(Icons.more_vert),
-                onPressed: () {},
+                onSelected: (value) async {
+                  switch (value) {
+                    case 'edit':
+                      await _openEditStoreDialog(s, docId);
+                      break;
+                    case 'toggle':
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(docId)
+                          .update({
+                        'isActive': !isActive,
+                        'updatedAt': FieldValue.serverTimestamp(),
+                      });
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              !isActive
+                                  ? 'Store "$name" activated'
+                                  : 'Store "$name" deactivated',
+                            ),
+                            backgroundColor: const Color(0xFF2F9C76),
+                          ),
+                        );
+                      }
+                      break;
+                    case 'delete':
+                      await _confirmDeleteStore(docId, name);
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit_outlined, size: 20),
+                        SizedBox(width: 10),
+                        Text('Edit Store'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'toggle',
+                    child: Row(
+                      children: [
+                        Icon(
+                          isActive ? Icons.person_off_outlined : Icons.person_outline,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(isActive ? 'Deactivate' : 'Activate'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                        SizedBox(width: 10),
+                        Text(
+                          'Delete Store',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -409,8 +767,21 @@ class _StoresPageState extends State<StoresPage> {
               ),
             ],
           ),
+          if (lastWrite != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Firestore last write: ${_formatFirestoreTime(lastWrite)}',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  String _formatFirestoreTime(Timestamp ts) {
+    final d = ts.toDate();
+    final m = d.minute.toString().padLeft(2, '0');
+    return '${d.day}/${d.month}/${d.year} ${d.hour}:$m';
   }
 }
