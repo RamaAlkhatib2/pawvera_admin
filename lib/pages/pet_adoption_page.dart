@@ -48,9 +48,9 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
       final idx = apps.indexOf(app);
       if (idx != -1) apps[idx]['status'] = 'approved';
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Application approved')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Application approved')));
   }
 
   void _reject(Map<String, String> app) {
@@ -58,9 +58,9 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
       final idx = apps.indexOf(app);
       if (idx != -1) apps[idx]['status'] = 'rejected';
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Application rejected')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Application rejected')));
   }
 
   Widget _buildCard(Map<String, String> a, {required bool pending}) {
@@ -210,7 +210,7 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
   @override
   Widget build(BuildContext context) {
     final qLower = q.toLowerCase();
-    final filtered = apps
+    final searched = apps
         .where(
           (a) =>
               a['name']!.toLowerCase().contains(qLower) ||
@@ -218,6 +218,16 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
               a['owner']!.toLowerCase().contains(qLower),
         )
         .toList();
+
+    List<Map<String, String>> filtered;
+    if (statusFilter == 'Pending') {
+      filtered = searched.where((a) => a['status'] == 'pending').toList();
+    } else if (statusFilter == 'Approved') {
+      filtered = searched.where((a) => a['status'] == 'approved').toList();
+    } else {
+      filtered = searched;
+    }
+
     final pending = filtered.where((a) => a['status'] == 'pending').toList();
     final approved = filtered.where((a) => a['status'] == 'approved').toList();
 
@@ -278,22 +288,24 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
 
           const SizedBox(height: 18),
 
-          Text(
-            'Pending Approval (${pending.length})',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          for (var a in pending)
-            _buildCard(a, pending: true),
+          if (statusFilter == 'All Statuses' || statusFilter == 'Pending') ...[
+            Text(
+              'Pending Approval (${pending.length})',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            for (var a in pending) _buildCard(a, pending: true),
+            const SizedBox(height: 12),
+          ],
 
-          const SizedBox(height: 12),
-          Text(
-            'Approved Listings (${approved.length})',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          for (var a in approved)
-            _buildCard(a, pending: false),
+          if (statusFilter == 'All Statuses' || statusFilter == 'Approved') ...[
+            Text(
+              'Approved Listings (${approved.length})',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            for (var a in approved) _buildCard(a, pending: false),
+          ],
         ],
       ),
     );
