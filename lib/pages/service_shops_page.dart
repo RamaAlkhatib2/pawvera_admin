@@ -367,6 +367,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
         Expanded(
           child: Text(
             value,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
           ),
         ),
@@ -572,7 +573,10 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
                       name,
@@ -581,7 +585,6 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                         fontSize: 15,
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -600,7 +603,6 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -626,33 +628,45 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Row(
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    const Icon(Icons.email_outlined, size: 13, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      email,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    if (createdAt != null) ...[
-                      const SizedBox(width: 16),
-                      const Icon(
-                        Icons.calendar_today_outlined,
-                        size: 13,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _formatDate(createdAt.toDate()),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.email_outlined,
+                            size: 13, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(
+                          email,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
+                      ],
+                    ),
+                    if (createdAt != null)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.calendar_today_outlined,
+                            size: 13,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _formatDate(createdAt.toDate()),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
                   ],
                 ),
               ],
@@ -660,6 +674,7 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
           ),
 
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               OutlinedButton(
                 onPressed: () async {

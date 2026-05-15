@@ -272,6 +272,7 @@ class _UsersPageState extends State<UsersPage> {
                                         children: [
                                           Text(
                                             name,
+                                            overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -279,6 +280,7 @@ class _UsersPageState extends State<UsersPage> {
                                           const SizedBox(height: 4),
                                           Text(
                                             email,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                               color: Colors.grey.shade600,
                                             ),
@@ -298,6 +300,7 @@ class _UsersPageState extends State<UsersPage> {
                                   children: [
                                     Text(
                                       email,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: Colors.grey.shade800,
                                       ),
@@ -305,6 +308,7 @@ class _UsersPageState extends State<UsersPage> {
                                     const SizedBox(height: 6),
                                     Text(
                                       phone,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: Colors.grey.shade600,
                                       ),
@@ -317,6 +321,7 @@ class _UsersPageState extends State<UsersPage> {
                                 flex: 2,
                                 child: Text(
                                   location,
+                                  overflow: TextOverflow.ellipsis,
                                   style:
                                       TextStyle(color: Colors.grey.shade700),
                                 ),
@@ -326,6 +331,7 @@ class _UsersPageState extends State<UsersPage> {
                                 flex: 1,
                                 child: Text(
                                   joined,
+                                  overflow: TextOverflow.ellipsis,
                                   style:
                                       TextStyle(color: Colors.grey.shade700),
                                 ),
@@ -349,6 +355,7 @@ class _UsersPageState extends State<UsersPage> {
                                     ),
                                     child: Text(
                                       isActive ? 'active' : 'inactive',
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: isActive
                                             ? const Color(0xFF2F9C76)

@@ -12,28 +12,7 @@ class RemindersPage extends StatefulWidget {
 class _RemindersPageState extends State<RemindersPage> {
   String q = '';
 
-  final types = [
-    {
-      'title': 'Vaccination',
-      'category': 'Health',
-      'desc': 'Annual or periodic vaccination reminders',
-    },
-    {
-      'title': 'Grooming',
-      'category': 'Grooming',
-      'desc': 'Regular grooming appointments',
-    },
-    {
-      'title': 'Vet Checkup',
-      'category': 'Health',
-      'desc': 'Routine veterinary checkups',
-    },
-    {
-      'title': 'Medication',
-      'category': 'Health',
-      'desc': 'Medication administration reminders',
-    },
-  ];
+  final types = <Map<String, String>>[];
 
   void _openAddDialog() {
     final titleCtl = TextEditingController();
@@ -175,6 +154,17 @@ class _RemindersPageState extends State<RemindersPage> {
                 ),
                 const SizedBox(height: 12),
 
+                if (filtered.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Center(
+                      child: Text(
+                        'No reminder types yet',
+                        style: TextStyle(color: Colors.grey.shade500),
+                      ),
+                    ),
+                  ),
+
                 Column(
                   children: [
                     for (var t in filtered)
@@ -189,58 +179,69 @@ class _RemindersPageState extends State<RemindersPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF0F6F4),
-                                    borderRadius: BorderRadius.circular(8),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF0F6F4),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.notifications),
                                   ),
-                                  child: const Icon(Icons.notifications),
-                                ),
-                                const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          t['title']!,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 6,
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          children: [
+                                            Text(
+                                              t['title']!,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFF3F4F6),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                t['category']!,
+                                                style: const TextStyle(
+                                                    fontSize: 12),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFF3F4F6),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            t['category']!,
-                                            style: const TextStyle(fontSize: 12),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          t['desc']!,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Colors.grey.shade700,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      t['desc']!,
-                                      style: TextStyle(
-                                        color: Colors.grey.shade700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
                                   onPressed: () {},

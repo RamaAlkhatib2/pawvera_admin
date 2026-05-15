@@ -12,43 +12,7 @@ class QrTagsPage extends StatefulWidget {
 class _QrTagsPageState extends State<QrTagsPage> {
   String q = '';
 
-  final tags = [
-    {
-      'id': 'QR-2025-001',
-      'pet': 'Max',
-      'owner': 'Sarah Johnson',
-      'date': '1/5/2025',
-      'scans': '24',
-    },
-    {
-      'id': 'QR-2025-002',
-      'pet': 'Luna',
-      'owner': 'Mike Chen',
-      'date': '1/3/2025',
-      'scans': '15',
-    },
-    {
-      'id': 'QR-2024-158',
-      'pet': 'Charlie',
-      'owner': 'Emma Davis',
-      'date': '12/20/2024',
-      'scans': '8',
-    },
-    {
-      'id': 'QR-2025-003',
-      'pet': 'Bella',
-      'owner': 'John Smith',
-      'date': '1/2/2025',
-      'scans': '32',
-    },
-    {
-      'id': 'QR-2024-145',
-      'pet': 'Rocky',
-      'owner': 'Lisa Brown',
-      'date': '12/15/2024',
-      'scans': '5',
-    },
-  ];
+  final tags = <Map<String, String>>[];
 
   int get totalScans =>
       tags.fold<int>(0, (s, t) => s + (int.tryParse(t['scans']!) ?? 0));
@@ -76,7 +40,13 @@ class _QrTagsPageState extends State<QrTagsPage> {
                 child: Icon(icon, color: color),
               ),
               const SizedBox(width: 12),
-              Text(label, style: const TextStyle(color: Colors.grey)),
+              Expanded(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -120,33 +90,38 @@ class _QrTagsPageState extends State<QrTagsPage> {
           ),
           const SizedBox(height: 16),
 
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 2.2,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _statCard(
-                'Total Tags',
-                tags.length.toString(),
-                const Color(0xFF9B7BD7),
-                Icons.qr_code,
-              ),
-              _statCard(
-                'Total Scans',
-                totalScans.toString(),
-                const Color(0xFF6FB4FF),
-                Icons.bar_chart,
-              ),
-              _statCard(
-                'Avg Scans/Tag',
-                avgScans.toStringAsFixed(0),
-                const Color(0xFF7EE9D1),
-                Icons.show_chart,
-              ),
-            ],
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: _statCard(
+                    'Total Tags',
+                    tags.length.toString(),
+                    const Color(0xFF9B7BD7),
+                    Icons.qr_code,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _statCard(
+                    'Total Scans',
+                    totalScans.toString(),
+                    const Color(0xFF6FB4FF),
+                    Icons.bar_chart,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _statCard(
+                    'Avg Scans/Tag',
+                    avgScans.toStringAsFixed(0),
+                    const Color(0xFF7EE9D1),
+                    Icons.show_chart,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -230,6 +205,17 @@ class _QrTagsPageState extends State<QrTagsPage> {
 
                 const SizedBox(height: 6),
 
+                if (filtered.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Center(
+                      child: Text(
+                        'No QR tags yet',
+                        style: TextStyle(color: Colors.grey.shade500),
+                      ),
+                    ),
+                  ),
+
                 Column(
                   children: [
                     for (var t in filtered)
@@ -253,6 +239,7 @@ class _QrTagsPageState extends State<QrTagsPage> {
                               flex: 2,
                               child: Text(
                                 t['id']!,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -262,6 +249,7 @@ class _QrTagsPageState extends State<QrTagsPage> {
                               flex: 2,
                               child: Text(
                                 t['pet']!,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: Colors.grey.shade800),
                               ),
                             ),
@@ -269,6 +257,7 @@ class _QrTagsPageState extends State<QrTagsPage> {
                               flex: 2,
                               child: Text(
                                 t['owner']!,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: Colors.grey.shade700),
                               ),
                             ),
@@ -276,6 +265,7 @@ class _QrTagsPageState extends State<QrTagsPage> {
                               flex: 2,
                               child: Text(
                                 t['date']!,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: Colors.grey.shade700),
                               ),
                             ),

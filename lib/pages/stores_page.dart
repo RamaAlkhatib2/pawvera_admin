@@ -145,9 +145,13 @@ class _StoresPageState extends State<StoresPage> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Expanded(
+                SizedBox(
+                  width: 280,
                   child: TextField(
                     onChanged: (v) => setState(() => q = v),
                     decoration: InputDecoration(
@@ -160,7 +164,6 @@ class _StoresPageState extends State<StoresPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
@@ -185,7 +188,6 @@ class _StoresPageState extends State<StoresPage> {
                         setState(() => status = v ?? 'All Statuses'),
                   ),
                 ),
-                const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _openAddStoreDialog,
                   style: ElevatedButton.styleFrom(
@@ -576,56 +578,63 @@ class _StoresPageState extends State<StoresPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0F6F4),
-                      borderRadius: BorderRadius.circular(8),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F6F4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.store),
                     ),
-                    child: const Icon(Icons.store),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: chipBg,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  statusText,
+                                  style: TextStyle(color: chipFg),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: chipBg,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              statusText,
-                              style: TextStyle(color: chipFg),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Owner: $owner',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Owner: $owner',
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
               PopupMenuButton<String>(
                 tooltip: 'Store actions',

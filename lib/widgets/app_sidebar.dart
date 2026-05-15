@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppSidebar extends StatelessWidget {
+class AppSidebar extends StatefulWidget {
   final String activePage;
   final void Function(String) onNavigate;
 
@@ -10,14 +10,42 @@ class AppSidebar extends StatelessWidget {
     required this.onNavigate,
   });
 
+  @override
+  State<AppSidebar> createState() => _AppSidebarState();
+}
+
+class _AppSidebarState extends State<AppSidebar> {
+  static const _petsPages = {'pets', 'types', 'adoption'};
+  static const _providersPages = {
+    'services',
+    'stores',
+    'providerShops',
+    'clinics',
+  };
+  late bool _petsExpanded = _petsPages.contains(widget.activePage);
+  late bool _providersExpanded =
+      _providersPages.contains(widget.activePage);
+
+  @override
+  void didUpdateWidget(covariant AppSidebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_petsPages.contains(widget.activePage) && !_petsExpanded) {
+      _petsExpanded = true;
+    }
+    if (_providersPages.contains(widget.activePage) && !_providersExpanded) {
+      _providersExpanded = true;
+    }
+  }
+
   Widget _navItem({
     required IconData icon,
     required String label,
     required String page,
+    double leftPadding = 0,
   }) {
-    final isActive = activePage == page;
+    final isActive = widget.activePage == page;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: EdgeInsets.fromLTRB(8 + leftPadding, 4, 8, 4),
       decoration: isActive
           ? BoxDecoration(
               color: const Color(0xFF5A9B7E),
@@ -33,7 +61,42 @@ class AppSidebar extends StatelessWidget {
             fontSize: 13,
           ),
         ),
-        onTap: () => onNavigate(page),
+        onTap: () => widget.onNavigate(page),
+      ),
+    );
+  }
+
+  Widget _groupHeader({
+    required IconData icon,
+    required String label,
+    required bool isAnyActive,
+    required bool expanded,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isAnyActive ? const Color(0xFFEFF5F2) : null,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isAnyActive ? const Color(0xFF5A9B7E) : Colors.grey,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isAnyActive ? const Color(0xFF5A9B7E) : Colors.black,
+            fontWeight: isAnyActive ? FontWeight.bold : FontWeight.normal,
+            fontSize: 13,
+          ),
+        ),
+        trailing: Icon(
+          expanded ? Icons.expand_less : Icons.expand_more,
+          color: Colors.grey,
+        ),
+        onTap: onTap,
       ),
     );
   }
@@ -61,21 +124,25 @@ class AppSidebar extends StatelessWidget {
                     child: const Icon(Icons.pets, color: Colors.white),
                   ),
                   const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'PawVera Admin',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'PawVera Admin',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Platform Management',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
+                        Text(
+                          'Platform Management',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -91,37 +158,68 @@ class AppSidebar extends StatelessWidget {
                     page: 'dashboard',
                   ),
                   _navItem(icon: Icons.people, label: 'Users', page: 'users'),
-                  _navItem(
-                    icon: Icons.health_and_safety,
-                    label: 'Add Provider',
-                    page: 'services',
+                  _groupHeader(
+                    icon: Icons.business_center,
+                    label: 'Providers',
+                    isAnyActive: _providersPages.contains(widget.activePage),
+                    expanded: _providersExpanded,
+                    onTap: () => setState(
+                        () => _providersExpanded = !_providersExpanded),
                   ),
-                  _navItem(
-                    icon: Icons.store,
-                    label: 'Pet Supplies Stores',
-                    page: 'stores',
+                  if (_providersExpanded) ...[
+                    _navItem(
+                      icon: Icons.health_and_safety,
+                      label: 'Add Provider',
+                      page: 'services',
+                      leftPadding: 16,
+                    ),
+                    _navItem(
+                      icon: Icons.store,
+                      label: 'Pet Supplies Stores',
+                      page: 'stores',
+                      leftPadding: 16,
+                    ),
+                    _navItem(
+                      icon: Icons.storefront,
+                      label: 'Service Provider Shops',
+                      page: 'providerShops',
+                      leftPadding: 16,
+                    ),
+                    _navItem(
+                      icon: Icons.local_hospital,
+                      label: 'Clinics',
+                      page: 'clinics',
+                      leftPadding: 16,
+                    ),
+                  ],
+                  _groupHeader(
+                    icon: Icons.pets,
+                    label: 'Pets',
+                    isAnyActive: _petsPages.contains(widget.activePage),
+                    expanded: _petsExpanded,
+                    onTap: () =>
+                        setState(() => _petsExpanded = !_petsExpanded),
                   ),
-                  _navItem(
-                    icon: Icons.storefront,
-                    label: 'Service Provider Shops',
-                    page: 'providerShops',
-                  ),
-                  _navItem(
-                    icon: Icons.local_hospital,
-                    label: 'Clinics',
-                    page: 'clinics',
-                  ),
-                  _navItem(
-                    icon: Icons.category,
-                    label: 'Pet Types',
-                    page: 'types',
-                  ),
-                  _navItem(icon: Icons.favorite, label: 'Pets', page: 'pets'),
-                  _navItem(
-                    icon: Icons.favorite_border,
-                    label: 'Pet Adoption',
-                    page: 'adoption',
-                  ),
+                  if (_petsExpanded) ...[
+                    _navItem(
+                      icon: Icons.favorite,
+                      label: 'Pets',
+                      page: 'pets',
+                      leftPadding: 16,
+                    ),
+                    _navItem(
+                      icon: Icons.category,
+                      label: 'Pet Types',
+                      page: 'types',
+                      leftPadding: 16,
+                    ),
+                    _navItem(
+                      icon: Icons.favorite_border,
+                      label: 'Pet Adoption',
+                      page: 'adoption',
+                      leftPadding: 16,
+                    ),
+                  ],
                   _navItem(
                     icon: Icons.qr_code,
                     label: 'QR Tags',
@@ -131,16 +229,6 @@ class AppSidebar extends StatelessWidget {
                     icon: Icons.notifications,
                     label: 'Reminders',
                     page: 'reminders',
-                  ),
-                  _navItem(
-                    icon: Icons.phone_iphone,
-                    label: 'Mobile App Preview',
-                    page: 'preview',
-                  ),
-                  _navItem(
-                    icon: Icons.history,
-                    label: 'Audit Logs',
-                    page: 'logs',
                   ),
                 ],
               ),

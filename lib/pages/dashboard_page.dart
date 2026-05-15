@@ -51,51 +51,33 @@ class DashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.6,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _statCard(
-                'Total Users',
-                '1,247',
-                Icons.people,
-                const Color(0xFF2D9CDB),
-              ),
-              _statCard(
-                'Registered Pets',
-                '2,134',
-                Icons.pets,
-                const Color(0xFF2FCF77),
-              ),
-              _statCard(
-                'QR Tags',
-                '2,134',
-                Icons.qr_code,
-                const Color(0xFF7BD7D0),
-              ),
-              _statCard(
-                'Vet Clinics',
-                '3',
-                Icons.local_hospital,
-                const Color(0xFFF5A623),
-              ),
-              _statCard(
-                'Online Stores',
-                '2',
-                Icons.store,
-                const Color(0xFF6FC7FF),
-              ),
-              _statCard(
-                'Service Shops',
-                '3',
-                Icons.build,
-                const Color(0xFFF7B267),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final cards = [
+                _statCard('Total Users', '0', Icons.people,
+                    const Color(0xFF2D9CDB)),
+                _statCard('Registered Pets', '0', Icons.pets,
+                    const Color(0xFF2FCF77)),
+                _statCard('QR Tags', '0', Icons.qr_code,
+                    const Color(0xFF7BD7D0)),
+                _statCard('Vet Clinics', '0', Icons.local_hospital,
+                    const Color(0xFFF5A623)),
+                _statCard('Online Stores', '0', Icons.store,
+                    const Color(0xFF6FC7FF)),
+                _statCard('Service Shops', '0', Icons.build,
+                    const Color(0xFFF7B267)),
+              ];
+              const spacing = 16.0;
+              final cardWidth = (constraints.maxWidth - spacing * 2) / 3;
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  for (final c in cards)
+                    SizedBox(width: cardWidth, child: c),
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: 24),
@@ -110,37 +92,45 @@ class DashboardPage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF1D6),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.info_outline,
-                        color: Color(0xFFF7A600),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          '2 Pending Adoption Approvals',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF1D6),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Review required',
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                        child: const Icon(
+                          Icons.info_outline,
+                          color: Color(0xFFF7A600),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'No pending adoption approvals',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Nothing to review',
+                              overflow: TextOverflow.ellipsis,
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -279,27 +269,19 @@ class DashboardPage extends StatelessWidget {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
+                        children: [
+                          const Text(
                             'Recent Activity',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 12),
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: CircleAvatar(child: Icon(Icons.person)),
-                            title: Text('New user registered'),
-                            subtitle: Text('Sarah Johnson • 5 minutes ago'),
-                          ),
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: CircleAvatar(
-                              backgroundColor: Color(0xFFE8FAF2),
-                              child: Icon(Icons.pets, color: Color(0xFF2F9C76)),
-                            ),
-                            title: Text('Pet profile created'),
-                            subtitle: Text(
-                              'Max (Golden Retriever) • 12 minutes ago',
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: Center(
+                              child: Text(
+                                'No recent activity',
+                                style: TextStyle(color: Colors.grey.shade500),
+                              ),
                             ),
                           ),
                         ],

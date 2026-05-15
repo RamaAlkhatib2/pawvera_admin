@@ -14,34 +14,7 @@ class _PetTypesPageState extends State<PetTypesPage> {
   String classification = 'All Classifications';
   String status = 'All Statuses';
 
-  final types = [
-    {
-      'title': 'Dog',
-      'subtitle': 'Domesticated canine companion',
-      'store': 'Pet Store A',
-      'breeds': [
-        'Labrador Retriever',
-        'Golden Retriever',
-        'German Shepherd',
-        'Bulldog',
-        'Poodle',
-      ],
-      'status': 'active',
-    },
-    {
-      'title': 'Cat',
-      'subtitle': 'Domesticated feline companion',
-      'store': 'Pet Store B',
-      'breeds': [
-        'Persian',
-        'Maine Coon',
-        'Siamese',
-        'British Shorthair',
-        'Ragdoll',
-      ],
-      'status': 'active',
-    },
-  ];
+  final types = <Map<String, Object>>[];
 
   void _openAddTypeDialog() {
     final nameCtl = TextEditingController();
@@ -189,9 +162,13 @@ class _PetTypesPageState extends State<PetTypesPage> {
           ),
           const SizedBox(height: 16),
 
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Expanded(
+              SizedBox(
+                width: 280,
                 child: TextField(
                   onChanged: (v) => setState(() => q = v),
                   decoration: InputDecoration(
@@ -204,7 +181,6 @@ class _PetTypesPageState extends State<PetTypesPage> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -225,7 +201,6 @@ class _PetTypesPageState extends State<PetTypesPage> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -246,7 +221,6 @@ class _PetTypesPageState extends State<PetTypesPage> {
                       setState(() => status = v ?? 'All Statuses'),
                 ),
               ),
-              const SizedBox(width: 12),
               ElevatedButton(
                 onPressed: _openAddTypeDialog,
                 style: ElevatedButton.styleFrom(
@@ -259,6 +233,27 @@ class _PetTypesPageState extends State<PetTypesPage> {
 
           const SizedBox(height: 16),
 
+          if (filtered.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.category,
+                        size: 48, color: Colors.grey.shade300),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No pet types yet',
+                      style: TextStyle(color: Colors.grey.shade500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Column(
             children: [
               for (var t in filtered)
@@ -275,78 +270,86 @@ class _PetTypesPageState extends State<PetTypesPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFDF3E9),
-                                  borderRadius: BorderRadius.circular(8),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFDF3E9),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.pets),
                                 ),
-                                child: const Icon(Icons.pets),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        (t['title'] as String),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF3F4F6),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          (t['title'] as String),
-                                          style: const TextStyle(fontSize: 12),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFEFFAF1),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          (t['status'] as String),
-                                          style: const TextStyle(
-                                            color: Color(0xFF2F9C76),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 6,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          Text(
+                                            (t['title'] as String),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
                                           ),
-                                        ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFF3F4F6),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              (t['title'] as String),
+                                              style: const TextStyle(fontSize: 12),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEFFAF1),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              (t['status'] as String),
+                                              style: const TextStyle(
+                                                color: Color(0xFF2F9C76),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        (t['subtitle'] as String),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(color: Colors.grey.shade700),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Store: ${(t['store'] as String)}',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(color: Colors.grey.shade700),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    (t['subtitle'] as String),
-                                    style: TextStyle(color: Colors.grey.shade700),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'Store: ${(t['store'] as String)}',
-                                    style: TextStyle(color: Colors.grey.shade700),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.edit),

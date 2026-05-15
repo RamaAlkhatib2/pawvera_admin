@@ -316,47 +316,53 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0F6F4),
-                      borderRadius: BorderRadius.circular(8),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0F6F4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.build, color: Color(0xFF5A9B7E)),
                     ),
-                    child: const Icon(Icons.build, color: Color(0xFF5A9B7E)),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15)),
-                          const SizedBox(width: 8),
-                          _chip(category, const Color(0xFFF3F4F6),
-                              Colors.black87),
-                          const SizedBox(width: 8),
-                          _chip(
-                            isActive ? 'Active' : 'Inactive',
-                            isActive
-                                ? const Color(0xFFEFFAF1)
-                                : const Color(0xFFF3F4F6),
-                            isActive
-                                ? const Color(0xFF2F9C76)
-                                : Colors.grey,
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15)),
+                              _chip(category, const Color(0xFFF3F4F6),
+                                  Colors.black87),
+                              _chip(
+                                isActive ? 'Active' : 'Inactive',
+                                isActive
+                                    ? const Color(0xFFEFFAF1)
+                                    : const Color(0xFFF3F4F6),
+                                isActive
+                                    ? const Color(0xFF2F9C76)
+                                    : Colors.grey,
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 6),
+                          Text('Owner: $owner',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.grey.shade700)),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text('Owner: $owner',
-                          style: TextStyle(color: Colors.grey.shade700)),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert),
@@ -367,24 +373,34 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
 
           const SizedBox(height: 12),
 
-          Row(
+          Wrap(
+            spacing: 20,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              if (email.isNotEmpty) ...[
-                const Icon(Icons.email_outlined, size: 14, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(email,
-                    style: TextStyle(
-                        color: Colors.grey.shade700, fontSize: 13)),
-                const SizedBox(width: 20),
-              ],
-              if (location.isNotEmpty) ...[
-                const Icon(Icons.location_on_outlined,
-                    size: 14, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(location,
-                    style: TextStyle(
-                        color: Colors.grey.shade700, fontSize: 13)),
-              ],
+              if (email.isNotEmpty)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.email_outlined, size: 14, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(email,
+                        style: TextStyle(
+                            color: Colors.grey.shade700, fontSize: 13)),
+                  ],
+                ),
+              if (location.isNotEmpty)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.location_on_outlined,
+                        size: 14, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(location,
+                        style: TextStyle(
+                            color: Colors.grey.shade700, fontSize: 13)),
+                  ],
+                ),
             ],
           ),
 
@@ -393,9 +409,13 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Bookings: $bookings',
-                  style: TextStyle(color: Colors.grey.shade700)),
+              Flexible(
+                child: Text('Bookings: $bookings',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey.shade700)),
+              ),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   OutlinedButton(
                     onPressed: () async {

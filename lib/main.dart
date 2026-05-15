@@ -14,7 +14,6 @@ import 'pages/pets_page.dart';
 import 'pages/pet_adoption_page.dart';
 import 'pages/qr_tags_page.dart';
 import 'pages/reminders_page.dart';
-import 'pages/audit_logs_page.dart';
 import 'pages/provider_shops_list_page.dart';
 
 Future<void> main() async {
@@ -128,10 +127,6 @@ class _MainAppState extends State<MainApp> {
         return QrTagsPage(onNavigate: _navigate);
       case 'reminders':
         return RemindersPage(onNavigate: _navigate);
-      case 'preview':
-        return const SimplePage(title: 'Mobile App Preview');
-      case 'logs':
-        return AuditLogsPage(onNavigate: _navigate);
       default:
         return DashboardPage(onNavigate: _navigate);
     }
@@ -141,6 +136,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'PawVera Admin',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5A9B7E)),

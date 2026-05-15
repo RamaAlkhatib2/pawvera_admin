@@ -13,35 +13,7 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
   String q = '';
   String statusFilter = 'All Statuses';
 
-  final apps = <Map<String, String>>[
-    {
-      'name': 'Max',
-      'type': 'Dog',
-      'breed': 'Labrador',
-      'age': '2 years',
-      'owner': 'Alice Brown',
-      'desc': 'Friendly and energetic dog looking for a loving home',
-      'status': 'pending',
-    },
-    {
-      'name': 'Charlie',
-      'type': 'Dog',
-      'breed': 'Golden Retriever',
-      'age': '1 years',
-      'owner': 'Carol Davis',
-      'desc': 'Playful puppy needs an active family',
-      'status': 'pending',
-    },
-    {
-      'name': 'Whiskers',
-      'type': 'Cat',
-      'breed': 'Persian',
-      'age': '3 years',
-      'owner': 'Samantha Grey',
-      'desc': 'Calm indoor cat, great with kids',
-      'status': 'approved',
-    },
-  ];
+  final apps = <Map<String, String>>[];
 
   void _approve(Map<String, String> app) {
     setState(() {
@@ -82,7 +54,10 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
                       a['name']!,
@@ -91,7 +66,6 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
                         fontSize: 16,
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -106,7 +80,6 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
                         style: const TextStyle(fontSize: 12),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     if (pending)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -167,9 +140,11 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
             ),
           ),
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (pending)
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     ElevatedButton(
                       onPressed: () => _approve(a),
@@ -287,6 +262,28 @@ class _PetAdoptionPageState extends State<PetAdoptionPage> {
           ),
 
           const SizedBox(height: 18),
+
+          if (pending.isEmpty && approved.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.favorite_border,
+                        size: 48, color: Colors.grey.shade300),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No adoption listings yet',
+                      style: TextStyle(color: Colors.grey.shade500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           if (statusFilter == 'All Statuses' || statusFilter == 'Pending') ...[
             Text(

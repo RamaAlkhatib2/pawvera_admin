@@ -12,38 +12,7 @@ class PetsPage extends StatefulWidget {
 class _PetsPageState extends State<PetsPage> {
   String q = '';
 
-  final pets = [
-    {
-      'name': 'Buddy',
-      'type': 'Dog',
-      'breed': 'Golden Retriever',
-      'age': '3 years',
-      'color': 'Golden',
-      'owner': 'John Smith',
-      'registered': 'Jan 15, 2024',
-      'qr': true,
-    },
-    {
-      'name': 'Max',
-      'type': 'Dog',
-      'breed': 'Labrador',
-      'age': '5 years',
-      'color': 'Black',
-      'owner': 'Sarah Johnson',
-      'registered': 'Nov 10, 2023',
-      'qr': false,
-    },
-    {
-      'name': 'Charlie',
-      'type': 'Dog',
-      'breed': 'Beagle',
-      'age': '4 years',
-      'color': 'Tricolor',
-      'owner': 'Mike Chen',
-      'registered': 'Mar 02, 2024',
-      'qr': false,
-    },
-  ];
+  final pets = <Map<String, Object>>[];
 
   Map<String, List<Map<String, Object>>> _groupByType() {
     final map = <String, List<Map<String, Object>>>{};
@@ -148,6 +117,27 @@ class _PetsPageState extends State<PetsPage> {
 
           const SizedBox(height: 18),
 
+          if (grouped.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.pets, size: 48, color: Colors.grey.shade300),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No pets yet',
+                      style: TextStyle(color: Colors.grey.shade500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           for (var entry in grouped.entries) ...[
             Text(
               '${entry.key} (${entry.value.length})',
@@ -166,79 +156,93 @@ class _PetsPageState extends State<PetsPage> {
                     ),
                     child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFDF3E9),
-                                borderRadius: BorderRadius.circular(8),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFDF3E9),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.pets),
                               ),
-                              child: const Icon(Icons.pets),
-                            ),
-                            const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            p['name'] as String,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        if ((p['qr'] as bool) == true)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEFF6FF),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: const [
+                                                Icon(
+                                                  Icons.qr_code,
+                                                  size: 14,
+                                                  color: Color(0xFF2F9C76),
+                                                ),
+                                                SizedBox(width: 6),
+                                                Text(
+                                                  'QR Tag',
+                                                  style: TextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
                                     Text(
-                                      p['name'] as String,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                      '${p['breed']} • ${p['age']} • ${p['color']}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Colors.grey.shade700),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Owner: ${p['owner']}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Colors.grey.shade600),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Registered: ${p['registered']}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 12,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    if ((p['qr'] as bool) == true)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFEFF6FF),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          children: const [
-                                            Icon(
-                                              Icons.qr_code,
-                                              size: 14,
-                                              color: Color(0xFF2F9C76),
-                                            ),
-                                            SizedBox(width: 6),
-                                            Text(
-                                              'QR Tag',
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  '${p['breed']} • ${p['age']} • ${p['color']}',
-                                  style: TextStyle(color: Colors.grey.shade700),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  'Owner: ${p['owner']}',
-                                  style: TextStyle(color: Colors.grey.shade600),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Registered: ${p['registered']}',
-                                  style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 12),
                         SizedBox(
                           width: 80,
                           child: OutlinedButton(

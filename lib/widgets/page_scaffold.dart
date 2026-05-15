@@ -57,29 +57,40 @@ class PageScaffold extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(width: 16),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: const [
-                        Text('Admin User', style: TextStyle(fontSize: 12)),
-                        Text(
-                          'admin@pawvera.com',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: const [
+                            Text(
+                              'Admin User',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            Text(
+                              'admin@pawvera.com',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5A9B7E),
-                        borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Icon(Icons.person, color: Colors.white),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF5A9B7E),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(Icons.person, color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
