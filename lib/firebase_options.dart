@@ -61,4 +61,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'pawvera-3578f.firebasestorage.app',
     measurementId: 'G-PV6PKW2DGL',
   );
+
 }
