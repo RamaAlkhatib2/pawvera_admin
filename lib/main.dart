@@ -12,7 +12,6 @@ import 'pages/service_shops_page.dart';
 import 'pages/pet_types_page.dart';
 import 'pages/pets_page.dart';
 import 'pages/pet_adoption_page.dart';
-import 'pages/qr_tags_page.dart';
 import 'pages/reminders_page.dart';
 import 'pages/provider_shops_list_page.dart';
 
@@ -115,16 +114,12 @@ class _MainAppState extends State<MainApp> {
         return ServiceShopsPage(onNavigate: _navigate);
       case 'providerShops':
         return ProviderShopsListPage(onNavigate: _navigate);
-      case 'clinics':
-        return const SimplePage(title: 'Clinics');
       case 'types':
         return PetTypesPage(onNavigate: _navigate);
       case 'pets':
         return PetsPage(onNavigate: _navigate);
       case 'adoption':
         return PetAdoptionPage(onNavigate: _navigate);
-      case 'qrtags':
-        return QrTagsPage(onNavigate: _navigate);
       case 'reminders':
         return RemindersPage(onNavigate: _navigate);
       default:

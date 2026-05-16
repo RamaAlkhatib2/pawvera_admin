@@ -14,116 +14,6 @@ class _StoresPageState extends State<StoresPage> {
   String q = '';
   String status = 'All Statuses';
 
-  void _openAddStoreDialog() {
-    final nameCtl = TextEditingController();
-    final ownerCtl = TextEditingController();
-    final emailCtl = TextEditingController();
-    final locationCtl = TextEditingController();
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Add New Shop'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtl,
-                decoration: InputDecoration(
-                  hintText: 'Shop Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: ownerCtl,
-                decoration: InputDecoration(
-                  hintText: 'Owner Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: emailCtl,
-                decoration: InputDecoration(
-                  hintText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: locationCtl,
-                decoration: InputDecoration(
-                  hintText: 'Location',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final businessName = nameCtl.text.trim().isEmpty
-                  ? 'New Store'
-                  : nameCtl.text.trim();
-
-              try {
-                await FirebaseFirestore.instance.collection('users').add({
-                  'role': 'provider',
-                  'providerType': 'Pet Supplies Store',
-                  'businessName': businessName,
-                  'owner': ownerCtl.text.trim(),
-                  'email': emailCtl.text.trim(),
-                  'location': locationCtl.text.trim(),
-                  'commission': '0%',
-                  'products': 0,
-                  'orders': 0,
-                  'isActive': true,
-                  'createdAt': FieldValue.serverTimestamp(),
-                  'updatedAt': FieldValue.serverTimestamp(),
-                  'createdBy': 'admin',
-                });
-
-                if (ctx.mounted) Navigator.of(ctx).pop();
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Store "$businessName" saved to Firestore'),
-                    backgroundColor: const Color(0xFF2F9C76),
-                  ),
-                );
-              } catch (e) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(
-                      content: Text('Firestore: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Add Shop'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,13 +77,6 @@ class _StoresPageState extends State<StoresPage> {
                     onChanged: (v) =>
                         setState(() => status = v ?? 'All Statuses'),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: _openAddStoreDialog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0B233F),
-                  ),
-                  child: const Text('+ Add Store'),
                 ),
               ],
             ),

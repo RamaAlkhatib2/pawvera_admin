@@ -20,7 +20,6 @@ class _AppSidebarState extends State<AppSidebar> {
     'services',
     'stores',
     'providerShops',
-    'clinics',
   };
   late bool _petsExpanded = _petsPages.contains(widget.activePage);
   late bool _providersExpanded =
@@ -185,12 +184,6 @@ class _AppSidebarState extends State<AppSidebar> {
                       page: 'providerShops',
                       leftPadding: 16,
                     ),
-                    _navItem(
-                      icon: Icons.local_hospital,
-                      label: 'Clinics',
-                      page: 'clinics',
-                      leftPadding: 16,
-                    ),
                   ],
                   _groupHeader(
                     icon: Icons.pets,
@@ -220,11 +213,6 @@ class _AppSidebarState extends State<AppSidebar> {
                       leftPadding: 16,
                     ),
                   ],
-                  _navItem(
-                    icon: Icons.qr_code,
-                    label: 'QR Tags',
-                    page: 'qrtags',
-                  ),
                   _navItem(
                     icon: Icons.notifications,
                     label: 'Reminders',

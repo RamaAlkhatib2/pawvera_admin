@@ -725,11 +725,30 @@ class _ServiceShopsPageState extends State<ServiceShopsPage> {
                       ],
                     ),
                   );
-                  if (ok == true) {
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(docId)
-                        .delete();
+                  if (ok == true && mounted) {
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(docId)
+                          .delete();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('"$name" deleted'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to delete: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
                   }
                 },
                 icon: const Icon(Icons.delete_outline, color: Colors.red),

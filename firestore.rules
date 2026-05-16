@@ -3,15 +3,44 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── /users/{uid} ─────────────────────────────────────────────
-    // Dev mode: admin panel has no auth yet — open to all.
-    // TODO: lock down once admin login is added.
+    // ── /users/{uid} and sub-collections ─────────────────────────
     match /users/{uid} {
+      allow read, write: if true;
+    }
+    match /users/{uid}/{sub=**} {
       allow read, write: if true;
     }
 
     // ── /admins/{uid} ────────────────────────────────────────────
     match /admins/{uid} {
+      allow read, write: if true;
+    }
+
+    // ── /service_shops/{id} and sub-collections ──────────────────
+    match /service_shops/{id} {
+      allow read, write: if true;
+    }
+    match /service_shops/{id}/{sub=**} {
+      allow read, write: if true;
+    }
+
+    // ── /adoption_posts/{id} ─────────────────────────────────────
+    match /adoption_posts/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /reminder_types/{id} ─────────────────────────────────────
+    match /reminder_types/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /pet_types/{id} ──────────────────────────────────────────
+    match /pet_types/{id} {
+      allow read, write: if true;
+    }
+
+    // ── collection group queries (e.g. collectionGroup('pets')) ──
+    match /{path=**}/pets/{petId} {
       allow read, write: if true;
     }
 

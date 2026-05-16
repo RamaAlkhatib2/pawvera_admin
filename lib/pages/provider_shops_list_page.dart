@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../widgets/page_scaffold.dart';
 
 class ProviderShopsListPage extends StatefulWidget {
@@ -13,163 +13,55 @@ class ProviderShopsListPage extends StatefulWidget {
 class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
   String q = '';
 
-  static const List<String> _categories = [
-    'Grooming',
-    'Training',
-    'Boarding',
-    'Daycare',
-    'Veterinary',
-    'Other',
-  ];
+  final _col = FirebaseFirestore.instance.collection('service_shops');
 
-  Future<void> _openAddShopDialog() async {
-    final nameCtl = TextEditingController();
-    final ownerCtl = TextEditingController();
-    final emailCtl = TextEditingController();
-    final locationCtl = TextEditingController();
-    String category = _categories.first;
-    bool isSaving = false;
-
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialog) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text('Add Service Provider Shop'),
-          content: SizedBox(
-            width: 420,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _label('Shop Name'),
-                  TextField(
-                    controller: nameCtl,
-                    decoration: _inputDeco('e.g., Pawfect Spa'),
-                  ),
-                  const SizedBox(height: 14),
-                  _label('Category'),
-                  DropdownButtonFormField<String>(
-                    initialValue: category,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 14),
-                    ),
-                    items: _categories
-                        .map((c) =>
-                            DropdownMenuItem(value: c, child: Text(c)))
-                        .toList(),
-                    onChanged: (v) =>
-                        setDialog(() => category = v ?? _categories.first),
-                  ),
-                  const SizedBox(height: 14),
-                  _label('Owner Name'),
-                  TextField(
-                    controller: ownerCtl,
-                    decoration: _inputDeco('e.g., Emma Wilson'),
-                  ),
-                  const SizedBox(height: 14),
-                  _label('Email'),
-                  TextField(
-                    controller: emailCtl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: _inputDeco('e.g., emma@pawfectspa.com'),
-                  ),
-                  const SizedBox(height: 14),
-                  _label('Location'),
-                  TextField(
-                    controller: locationCtl,
-                    decoration: _inputDeco('e.g., Downtown Plaza'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: isSaving ? null : () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0B233F)),
-              onPressed: isSaving
-                  ? null
-                  : () async {
-                      final name = nameCtl.text.trim();
-                      if (name.isEmpty) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                              content: Text('Please enter a shop name')),
-                        );
-                        return;
-                      }
-                      setDialog(() => isSaving = true);
-                      try {
-                        await FirebaseFirestore.instance
-                            .collection('serviceShops')
-                            .add({
-                          'name': name,
-                          'category': category,
-                          'owner': ownerCtl.text.trim(),
-                          'email': emailCtl.text.trim(),
-                          'location': locationCtl.text.trim(),
-                          'bookings': 0,
-                          'status': 'active',
-                          'createdAt': FieldValue.serverTimestamp(),
-                        });
-                        if (ctx.mounted) Navigator.of(ctx).pop();
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Shop "$name" added'),
-                              backgroundColor: const Color(0xFF2F9C76),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        setDialog(() => isSaving = false);
-                        if (ctx.mounted) {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            SnackBar(
-                                content: Text('Error: $e'),
-                                backgroundColor: Colors.red),
-                          );
-                        }
-                      }
-                    },
-              child: isSaving
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Text('Add Shop'),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _toggleOpen(String docId, bool current) async {
+    await _col.doc(docId).update({
+      'isOpen': !current,
+      'status': current ? 'Closed' : 'Open',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 13)),
-      );
-
-  InputDecoration _inputDeco(String hint) => InputDecoration(
-        hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      );
+  Future<void> _delete(String docId, String name) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text('Delete Shop'),
+        content: Text('Are you sure you want to delete "$name"? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && mounted) {
+      try {
+        await _col.doc(docId).delete();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('"$name" deleted'),
+              backgroundColor: Colors.red.shade700,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,42 +77,20 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
           ),
           const SizedBox(height: 16),
 
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  onChanged: (v) => setState(() => q = v),
-                  decoration: InputDecoration(
-                    hintText: 'Search by shop name, owner, or category...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                onPressed: _openAddShopDialog,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0B233F),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
-                ),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add Shop'),
-              ),
-            ],
+          TextField(
+            onChanged: (v) => setState(() => q = v),
+            decoration: InputDecoration(
+              hintText: 'Search by shop name, email, or address...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            ),
           ),
 
           const SizedBox(height: 16),
 
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('serviceShops')
-                .orderBy('createdAt', descending: true)
-                .snapshots(),
+            stream: _col.orderBy('createdAt', descending: true).snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
@@ -241,18 +111,12 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
               }
 
               final docs = snapshot.data?.docs ?? [];
+              final qLower = q.toLowerCase();
               final filtered = docs.where((doc) {
                 final d = doc.data() as Map<String, dynamic>;
-                final search = q.toLowerCase();
-                return (d['name'] as String? ?? '')
-                        .toLowerCase()
-                        .contains(search) ||
-                    (d['owner'] as String? ?? '')
-                        .toLowerCase()
-                        .contains(search) ||
-                    (d['category'] as String? ?? '')
-                        .toLowerCase()
-                        .contains(search);
+                return (d['shopName'] as String? ?? '').toLowerCase().contains(qLower) ||
+                    (d['email'] as String? ?? '').toLowerCase().contains(qLower) ||
+                    (d['address'] as String? ?? '').toLowerCase().contains(qLower);
               }).toList();
 
               if (filtered.isEmpty) {
@@ -270,7 +134,7 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
                         const SizedBox(height: 12),
                         Text(
                           docs.isEmpty
-                              ? 'No shops yet. Click "Add Shop" to create one.'
+                              ? 'No service shops found.'
                               : 'No shops match your search.',
                           style: TextStyle(color: Colors.grey.shade500),
                         ),
@@ -282,8 +146,8 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
 
               return Column(
                 children: filtered
-                    .map((doc) => _buildShopCard(
-                        doc.data() as Map<String, dynamic>, doc.id))
+                    .map((doc) =>
+                        _buildShopCard(doc.data() as Map<String, dynamic>, doc.id))
                     .toList(),
               );
             },
@@ -293,15 +157,17 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
     );
   }
 
-  Widget _buildShopCard(Map<String, dynamic> data, String docId) {
-    final name = data['name'] as String? ?? 'Unnamed';
-    final category = data['category'] as String? ?? '';
-    final owner = data['owner'] as String? ?? '';
-    final email = data['email'] as String? ?? '';
-    final location = data['location'] as String? ?? '';
-    final bookings = data['bookings'] ?? 0;
-    final status = data['status'] as String? ?? 'active';
-    final isActive = status == 'active';
+  Widget _buildShopCard(Map<String, dynamic> d, String docId) {
+    final name = d['shopName'] as String? ?? 'Unnamed';
+    final email = d['email'] as String? ?? '';
+    final phone = d['phone'] as String? ?? '';
+    final address = d['address'] as String? ?? '';
+    final workingHours = d['workingHours'] as String? ?? '';
+    final isOpen = d['isOpen'] as bool? ?? false;
+    final totalBookings = d['totalBookings'] ?? 0;
+    final activeBookings = d['activeBookings'] ?? 0;
+    final servicesCount = d['activeServicesCount'] ?? 0;
+    final totalRevenue = d['totalRevenue'] ?? 0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -309,168 +175,122 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
+        border: Border(
+          left: BorderSide(
+            color: isOpen ? const Color(0xFF2F9C76) : Colors.grey.shade300,
+            width: 3,
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F6F4),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.storefront, color: Color(0xFF5A9B7E), size: 22),
+              ),
+              const SizedBox(width: 12),
               Expanded(
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F6F4),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.build, color: Color(0xFF5A9B7E)),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15)),
+                        _chip(
+                          isOpen ? 'Open' : 'Closed',
+                          isOpen ? const Color(0xFFEFFAF1) : const Color(0xFFF3F4F6),
+                          isOpen ? const Color(0xFF2F9C76) : Colors.grey,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    if (workingHours.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 6,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15)),
-                              _chip(category, const Color(0xFFF3F4F6),
-                                  Colors.black87),
-                              _chip(
-                                isActive ? 'Active' : 'Inactive',
-                                isActive
-                                    ? const Color(0xFFEFFAF1)
-                                    : const Color(0xFFF3F4F6),
-                                isActive
-                                    ? const Color(0xFF2F9C76)
-                                    : Colors.grey,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text('Owner: $owner',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.grey.shade700)),
+                          const Icon(Icons.access_time, size: 13, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(workingHours,
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey.shade600)),
                         ],
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
-              IconButton(
+              PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
-                onPressed: () => _showActions(context, data, docId),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          Wrap(
-            spacing: 20,
-            runSpacing: 6,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              if (email.isNotEmpty)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.email_outlined, size: 14, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(email,
-                        style: TextStyle(
-                            color: Colors.grey.shade700, fontSize: 13)),
-                  ],
-                ),
-              if (location.isNotEmpty)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.location_on_outlined,
-                        size: 14, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(location,
-                        style: TextStyle(
-                            color: Colors.grey.shade700, fontSize: 13)),
-                  ],
-                ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text('Bookings: $bookings',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey.shade700)),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedButton(
-                    onPressed: () async {
-                      await FirebaseFirestore.instance
-                          .collection('serviceShops')
-                          .doc(docId)
-                          .update({'status': isActive ? 'inactive' : 'active'});
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor:
-                          isActive ? Colors.orange : const Color(0xFF2F9C76),
-                      side: BorderSide(
-                          color: isActive
-                              ? Colors.orange
-                              : const Color(0xFF2F9C76)),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: Text(isActive ? 'Deactivate' : 'Activate'),
+                onSelected: (action) {
+                  if (action == 'toggle') _toggleOpen(docId, isOpen);
+                  if (action == 'delete') _delete(docId, name);
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'toggle',
+                    child: Row(children: [
+                      Icon(
+                        isOpen ? Icons.pause_circle : Icons.play_circle,
+                        color: isOpen ? Colors.orange : const Color(0xFF2F9C76),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(isOpen ? 'Mark Closed' : 'Mark Open'),
+                    ]),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () async {
-                      final ok = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          title: const Text('Delete Shop'),
-                          content: Text(
-                              'Are you sure you want to delete "$name"?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(false),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(true),
-                              child: const Text('Delete',
-                                  style: TextStyle(color: Colors.red)),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (ok == true) {
-                        await FirebaseFirestore.instance
-                            .collection('serviceShops')
-                            .doc(docId)
-                            .delete();
-                      }
-                    },
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(children: [
+                      Icon(Icons.delete, color: Colors.red, size: 18),
+                      SizedBox(width: 8),
+                      Text('Delete', style: TextStyle(color: Colors.red)),
+                    ]),
                   ),
                 ],
               ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+
+          // Contact info
+          Wrap(
+            spacing: 20,
+            runSpacing: 8,
+            children: [
+              if (email.isNotEmpty) _infoItem(Icons.email_outlined, email),
+              if (phone.isNotEmpty) _infoItem(Icons.phone_outlined, phone),
+              if (address.isNotEmpty) _infoItem(Icons.location_on_outlined, address),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Stats row
+          Row(
+            children: [
+              _statBox('Total Bookings', '$totalBookings', const Color(0xFF5A9B7E)),
+              const SizedBox(width: 8),
+              _statBox('Active Bookings', '$activeBookings', const Color(0xFFF5A623)),
+              const SizedBox(width: 8),
+              _statBox('Services', '$servicesCount', const Color(0xFF9B7BD7)),
+              const SizedBox(width: 8),
+              _statBox('Revenue', '\$$totalRevenue', const Color(0xFF2D9CDB)),
             ],
           ),
         ],
@@ -478,50 +298,44 @@ class _ProviderShopsListPageState extends State<ProviderShopsListPage> {
     );
   }
 
+  Widget _infoItem(IconData icon, String text) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: Colors.grey),
+          const SizedBox(width: 4),
+          Text(text,
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+        ],
+      );
+
+  Widget _statBox(String label, String value, Color color) => Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: color)),
+              Text(label,
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+            ],
+          ),
+        ),
+      );
+
   Widget _chip(String label, Color bg, Color fg) => Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration:
             BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
         child: Text(label,
             style: TextStyle(
                 fontSize: 11, color: fg, fontWeight: FontWeight.w600)),
       );
-
-  void _showActions(
-      BuildContext context, Map<String, dynamic> data, String docId) {
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit Shop'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: open edit dialog
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete Shop',
-                  style: TextStyle(color: Colors.red)),
-              onTap: () async {
-                Navigator.pop(context);
-                await FirebaseFirestore.instance
-                    .collection('serviceShops')
-                    .doc(docId)
-                    .delete();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
