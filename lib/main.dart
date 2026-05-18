@@ -14,6 +14,12 @@ import 'pages/pets_page.dart';
 import 'pages/pet_adoption_page.dart';
 import 'pages/reminders_page.dart';
 import 'pages/provider_shops_list_page.dart';
+import 'pages/bookings_page.dart';
+import 'pages/orders_page.dart';
+import 'pages/products_page.dart';
+import 'pages/reviews_page.dart';
+import 'pages/conversations_page.dart';
+import 'pages/notifications_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -122,6 +128,18 @@ class _MainAppState extends State<MainApp> {
         return PetAdoptionPage(onNavigate: _navigate);
       case 'reminders':
         return RemindersPage(onNavigate: _navigate);
+      case 'bookings':
+        return BookingsPage(onNavigate: _navigate);
+      case 'orders':
+        return OrdersPage(onNavigate: _navigate);
+      case 'products':
+        return ProductsPage(onNavigate: _navigate);
+      case 'reviews':
+        return ReviewsPage(onNavigate: _navigate);
+      case 'conversations':
+        return ConversationsPage(onNavigate: _navigate);
+      case 'notifications':
+        return NotificationsPage(onNavigate: _navigate);
       default:
         return DashboardPage(onNavigate: _navigate);
     }

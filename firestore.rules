@@ -39,6 +39,47 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // ── /bookings/{id} ───────────────────────────────────────────
+    match /bookings/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /orders/{id} ─────────────────────────────────────────────
+    match /orders/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /products/{id} ───────────────────────────────────────────
+    match /products/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /reviews/{id} ────────────────────────────────────────────
+    match /reviews/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /conversations/{id} and messages sub-collection ──────────
+    match /conversations/{id} {
+      allow read, write: if true;
+    }
+    match /conversations/{id}/messages/{msgId} {
+      allow read, write: if true;
+    }
+
+    // ── /notifications/{id} ──────────────────────────────────────
+    match /notifications/{id} {
+      allow read, write: if true;
+    }
+
+    // ── /users_cart/{id} and sub-collections ─────────────────────
+    match /users_cart/{id} {
+      allow read, write: if true;
+    }
+    match /users_cart/{id}/{sub=**} {
+      allow read, write: if true;
+    }
+
     // ── collection group queries (e.g. collectionGroup('pets')) ──
     match /{path=**}/pets/{petId} {
       allow read, write: if true;

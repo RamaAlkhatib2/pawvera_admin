@@ -16,14 +16,11 @@ class AppSidebar extends StatefulWidget {
 
 class _AppSidebarState extends State<AppSidebar> {
   static const _petsPages = {'pets', 'types', 'adoption'};
-  static const _providersPages = {
-    'services',
-    'stores',
-    'providerShops',
-  };
+  static const _providersPages = {'services', 'stores', 'providerShops'};
+  static const _commercePages = {'products', 'orders'};
   late bool _petsExpanded = _petsPages.contains(widget.activePage);
-  late bool _providersExpanded =
-      _providersPages.contains(widget.activePage);
+  late bool _providersExpanded = _providersPages.contains(widget.activePage);
+  late bool _commerceExpanded = _commercePages.contains(widget.activePage);
 
   @override
   void didUpdateWidget(covariant AppSidebar oldWidget) {
@@ -33,6 +30,9 @@ class _AppSidebarState extends State<AppSidebar> {
     }
     if (_providersPages.contains(widget.activePage) && !_providersExpanded) {
       _providersExpanded = true;
+    }
+    if (_commercePages.contains(widget.activePage) && !_commerceExpanded) {
+      _commerceExpanded = true;
     }
   }
 
@@ -213,8 +213,49 @@ class _AppSidebarState extends State<AppSidebar> {
                       leftPadding: 16,
                     ),
                   ],
+                  _groupHeader(
+                    icon: Icons.shopping_cart_outlined,
+                    label: 'Commerce',
+                    isAnyActive: _commercePages.contains(widget.activePage),
+                    expanded: _commerceExpanded,
+                    onTap: () => setState(() => _commerceExpanded = !_commerceExpanded),
+                  ),
+                  if (_commerceExpanded) ...[
+                    _navItem(
+                      icon: Icons.inventory_2_outlined,
+                      label: 'Products',
+                      page: 'products',
+                      leftPadding: 16,
+                    ),
+                    _navItem(
+                      icon: Icons.shopping_bag_outlined,
+                      label: 'Orders',
+                      page: 'orders',
+                      leftPadding: 16,
+                    ),
+                  ],
                   _navItem(
-                    icon: Icons.notifications,
+                    icon: Icons.event_note,
+                    label: 'Bookings',
+                    page: 'bookings',
+                  ),
+                  _navItem(
+                    icon: Icons.chat_bubble_outline,
+                    label: 'Conversations',
+                    page: 'conversations',
+                  ),
+                  _navItem(
+                    icon: Icons.star_border,
+                    label: 'Reviews',
+                    page: 'reviews',
+                  ),
+                  _navItem(
+                    icon: Icons.notifications_none,
+                    label: 'Notifications',
+                    page: 'notifications',
+                  ),
+                  _navItem(
+                    icon: Icons.alarm,
                     label: 'Reminders',
                     page: 'reminders',
                   ),
